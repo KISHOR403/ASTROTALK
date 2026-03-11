@@ -17,7 +17,6 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
-import Astrologers from "./pages/Astrologers";
 import AstrologerDashboard from "./pages/astrologer/Dashboard";
 import Availability from "./pages/astrologer/Availability";
 import Bookings from "./pages/astrologer/Bookings";
@@ -54,7 +53,6 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/chat/:bookingId" element={<Chat />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/astrologers" element={<Astrologers />} />
           <Route path="/astrologer/dashboard" element={<AstrologerDashboard />} />
           <Route path="/astrologer/availability" element={<Availability />} />
           <Route path="/astrologer/bookings" element={<Bookings />} />

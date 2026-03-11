@@ -6,7 +6,6 @@ const tabs = [
   { name: 'Horoscope', path: '/horoscope', icon: Star },
   { name: 'Book', path: '/booking', icon: CalendarDays },
   { name: 'Chat', path: '/chat', icon: MessageCircle },
-  { name: 'Astrologers', path: '/astrologers', icon: Users },
 ];
 
 const MobileBottomNav = () => {
@@ -22,11 +21,10 @@ const MobileBottomNav = () => {
             <Link
               key={tab.path}
               to={tab.path}
-              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
-                isActive
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${isActive
                   ? 'text-accent'
                   : 'text-muted-foreground'
-              }`}
+                }`}
             >
               <Icon className={`w-5 h-5 ${isActive ? 'drop-shadow-[0_0_6px_hsl(42_80%_55%/0.6)]' : ''}`} />
               <span className="text-[10px] font-medium">{tab.name}</span>

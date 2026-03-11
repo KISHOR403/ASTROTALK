@@ -15,7 +15,6 @@ const navLinks = [
   { name: 'Book Consultation', path: '/booking' },
   { name: 'Blog', path: '/blog' },
   { name: 'Chat', path: '/chat' },
-  { name: 'Astrologers', path: '/astrologers' },
 ];
 
 const Navbar = () => {
