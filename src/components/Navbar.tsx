@@ -76,7 +76,7 @@ const Navbar = () => {
                 <Star className="w-4 h-4 text-primary absolute -top-1 -right-1 animate-star-twinkle" />
               </div>
               <span className="font-display text-xl md:text-2xl font-semibold text-gradient-gold">
-                VedicStar
+                AstroTalk
               </span>
             </Link>
 

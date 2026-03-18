@@ -65,21 +65,20 @@ const HeroSection = () => {
             transition={{ delay: 0.2 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
-            <span className="text-sm text-primary-foreground/80">Ancient Wisdom, Modern Insights</span>
+            <span className="text-sm tracking-[0.3em] uppercase text-accent">✦ Discover Your Cosmic Path ✦</span>
           </motion.div>
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-foreground">Discover Your</span>
-            <br />
-            <span className="text-gradient-aurora">Cosmic Destiny</span>
+            <span className="text-gradient-aurora">AstroTalk Unveiled</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Unlock the secrets of Vedic astrology with personalized birth charts, 
-            compatibility analysis, and divine guidance for your life's journey.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 leading-relaxed">
+            The Future of Astrology in a Digital World
+          </p>
+          <p className="text-base md:text-lg text-muted-foreground/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Unlock AI-powered horoscopes, Kundali readings, and personalized cosmic guidance.
           </p>
 
           {/* CTA Buttons */}

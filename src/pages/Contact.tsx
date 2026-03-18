@@ -53,8 +53,8 @@ const ContactPage = () => {
                   <div>
                     <h3 className="font-display text-lg font-semibold mb-1">Email Us</h3>
                     <p className="text-muted-foreground text-sm mb-2">We'll respond within 24 hours</p>
-                    <a href="mailto:hello@vedicstar.com" className="text-accent hover:underline">
-                      hello@vedicstar.com
+                    <a href="mailto:hello@astrotalk.com" className="text-accent hover:underline">
+                      hello@astrotalk.com
                     </a>
                   </div>
                 </div>
