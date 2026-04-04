@@ -1,26 +1,66 @@
-// @desc    Get mock horoscope for a zodiac sign
+const fs = require('fs');
+const path = require('path');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const BirthChart = require('../models/BirthChart');
+
+// @desc    Get AI-generated few-shot horoscope for a zodiac sign
 // @route   GET /api/astro/horoscope/:sign
 // @access  Public
 const getHoroscope = async (req, res) => {
-    const { sign } = req.params;
-    const horoscopes = {
-        aries: "Today, your energy is high. Take the lead in new projects.",
-        taurus: "Focus on stability. A financial opportunity may arise.",
-        gemini: "Communication is key. Share your ideas with others.",
-        cancer: "Trust your intuition. Home and family take center stage.",
-        leo: "Your creativity shines. Step into the spotlight.",
-        virgo: "Attention to detail will pay off. Organize your workspace.",
-        libra: "Balance is essential. Seek harmony in your relationships.",
-        scorpio: "Embrace transformation. Let go of what no longer serves you.",
-        sagittarius: "Adventure awaits. Expand your horizons through learning.",
-        capricorn: "Hard work brings rewards. Stay disciplined and focused.",
-        aquarius: "Innovation is sparked. Think outside the box.",
-        pisces: "Dream big. Your imagination is a powerful tool."
-    };
+    try {
+        const { sign } = req.params;
+        const apiKey = process.env.GEMINI_API_KEY;
+        
+        if (!apiKey) {
+            // Fallback for missing API Key to prevent crash
+            return res.json({ 
+                sign, 
+                daily: "Today brings powerful cosmic energy. Focus on your goals.",
+                mood: "Optimistic", colour: "Blue", lucky_number: 7, compatible_sign: "Taurus"
+            });
+        }
 
-    const message = horoscopes[sign.toLowerCase()] || "May the stars guide you today!";
-    res.json({ sign, message });
+        // Load mock dataset for few-shot prompting
+        const datasetPath = path.join(__dirname, '..', 'data', 'horoscope_dataset.json');
+        let examplesArray = [];
+        if (fs.existsSync(datasetPath)) {
+            const data = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+            examplesArray = data.filter(d => d.sign.toLowerCase() === sign.toLowerCase());
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        let prompt = `You are an expert Vedic Astrologer. Generate a daily horoscope for the zodiac sign ${sign}.\n`;
+        prompt += `Include the following in your prediction based on astrological transits:\n`;
+        prompt += `- daily: A personalized daily horoscope paragraph (about 3-4 sentences)\n`;
+        prompt += `- mood: The dominant mood for the day\n`;
+        prompt += `- colour: Lucky colour\n`;
+        prompt += `- lucky_number: Lucky digit (10-99)\n`;
+        prompt += `- compatible_sign: Most compatible sign today\n\n`;
+
+        if (examplesArray.length > 0) {
+            prompt += `Here are some past examples of the tone and style you should match for ${sign}:\n`;
+            examplesArray.slice(0, 3).forEach((ex, idx) => {
+                prompt += `Example ${idx + 1}: ${ex.caption}. Mood: ${ex.mood}. Color: ${ex.colour}. Number: ${ex.lucky_digit}. Compatible: ${ex.compatible_sign}\n`;
+            });
+        }
+
+        prompt += `\nPlease output the response purely as a valid JSON object without any markdown formatting. Use the exact keys: 'daily', 'mood', 'colour', 'lucky_number', 'compatible_sign'.`;
+
+        const result = await model.generateContent(prompt);
+        let responseText = result.response.text();
+        
+        // Clean markdown JSON wrapping if Gemini adds it
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const parsedData = JSON.parse(responseText);
+
+        res.json({ sign, ...parsedData });
+    } catch (error) {
+        console.error("Gemini Horoscope Error:", error);
+        res.status(500).json({ message: "Failed to generate horoscope" });
+    }
 };
 
 // @desc    Get mock compatibility between two zodiac signs
@@ -350,7 +390,7 @@ function buildInterpretations(ascendant, sunSign, moonSign, planetsArray) {
     return { sections, planetDetails };
 }
 
-// @desc    Get birth chart from external API
+// @desc    Get birth chart from Python Microservice (pyswisseph)
 // @route   POST /api/astro/birth-chart
 // @access  Public
 const getBirthChart = async (req, res) => {
@@ -363,27 +403,48 @@ const getBirthChart = async (req, res) => {
     try {
         // 1. Get Coordinates
         const coordinates = await getCoordinates(location);
+        const [latStr, lonStr] = coordinates.split(',');
+        const lat = parseFloat(latStr);
+        const lon = parseFloat(lonStr);
 
-        // 2. Format DateTime
-        const dateTimeStr = `${dateOfBirth}T${timeOfBirth}:00+05:30`;
-
-        // 3. Get Auth Token
-        const token = await getProkeralaToken();
-
-        // 4. Fetch Planet Positions
-        const planetRes = await fetch(`https://api.prokerala.com/v2/astrology/planet-position?datetime=${encodeURIComponent(dateTimeStr)}&coordinates=${coordinates}&ayanamsa=1`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        // 2. Fetch Planet Positions from local Python Microservice
+        const planetRes = await fetch(`http://127.0.0.1:5001/ephemeris`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                date: dateOfBirth, // format: YYYY-MM-DD
+                time: timeOfBirth, // format: HH:MM
+                lat,
+                lon
+            })
         });
 
         if (!planetRes.ok) {
             const errBody = await planetRes.text();
-            throw new Error(`Prokerala API error: ${errBody}`);
+            throw new Error(`Python Microservice error: ${errBody}`);
         }
 
         const planetData = await planetRes.json();
 
-        // 5. Parse planet positions
-        const planetsArray = planetData.data?.planet_position || [];
+        // 3. Map returned data to expected planetsArray format
+        const planetsArray = [];
+        planetsArray.push({
+            name: 'Ascendant',
+            rasi: { name: planetData.ascendant.sign },
+            degree: planetData.ascendant.degree,
+            is_retrograde: false
+        });
+        
+        if (planetData.planets) {
+            planetData.planets.forEach(p => {
+                 planetsArray.push({
+                     name: p.name,
+                     rasi: { name: p.sign },
+                     degree: p.degree,
+                     is_retrograde: p.is_retrograde
+                 });
+            });
+        }
 
         const ascendantObj = planetsArray.find(p => p.name === 'Ascendant');
         const ascendant = normalizeRashiName(ascendantObj?.rasi?.name);

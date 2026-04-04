@@ -1,0 +1,362 @@
+[
+  {
+    "sign": "Aries",
+    "date": "2026-04-05",
+    "caption": "Balance in your diet and daily routine is extremely necessary right now. Prioritize self-care.",
+    "compatible_sign": "Gemini",
+    "mood": "Romantic",
+    "colour": "Gold",
+    "lucky_digit": 90,
+    "lucky_time": "10:14 PM"
+  },
+  {
+    "sign": "Aries",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Taurus",
+    "mood": "Calm",
+    "colour": "Blue",
+    "lucky_digit": 11,
+    "lucky_time": "3:44 PM"
+  },
+  {
+    "sign": "Aries",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Cancer",
+    "mood": "Adventurous",
+    "colour": "Gold",
+    "lucky_digit": 57,
+    "lucky_time": "9:35 AM"
+  },
+  {
+    "sign": "Taurus",
+    "date": "2026-04-05",
+    "caption": "You might uncover a hidden truth about a trusted friend. Process it before reacting.",
+    "compatible_sign": "Scorpio",
+    "mood": "Reflective",
+    "colour": "Blue",
+    "lucky_digit": 87,
+    "lucky_time": "7:28 AM"
+  },
+  {
+    "sign": "Taurus",
+    "date": "2026-04-05",
+    "caption": "You might uncover a hidden truth about a trusted friend. Process it before reacting.",
+    "compatible_sign": "Libra",
+    "mood": "Creative",
+    "colour": "Blue",
+    "lucky_digit": 57,
+    "lucky_time": "8:10 AM"
+  },
+  {
+    "sign": "Taurus",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Capricorn",
+    "mood": "Energetic",
+    "colour": "White",
+    "lucky_digit": 37,
+    "lucky_time": "12:42 PM"
+  },
+  {
+    "sign": "Gemini",
+    "date": "2026-04-05",
+    "caption": "Your communication skills are at a peak. It is a great time to pitch your bold ideas.",
+    "compatible_sign": "Gemini",
+    "mood": "Energetic",
+    "colour": "Pink",
+    "lucky_digit": 86,
+    "lucky_time": "2:27 AM"
+  },
+  {
+    "sign": "Gemini",
+    "date": "2026-04-05",
+    "caption": "Balance in your diet and daily routine is extremely necessary right now. Prioritize self-care.",
+    "compatible_sign": "Scorpio",
+    "mood": "Energetic",
+    "colour": "Red",
+    "lucky_digit": 88,
+    "lucky_time": "9:34 PM"
+  },
+  {
+    "sign": "Gemini",
+    "date": "2026-04-05",
+    "caption": "You might uncover a hidden truth about a trusted friend. Process it before reacting.",
+    "compatible_sign": "Capricorn",
+    "mood": "Romantic",
+    "colour": "White",
+    "lucky_digit": 71,
+    "lucky_time": "4:49 PM"
+  },
+  {
+    "sign": "Cancer",
+    "date": "2026-04-05",
+    "caption": "Balance in your diet and daily routine is extremely necessary right now. Prioritize self-care.",
+    "compatible_sign": "Sagittarius",
+    "mood": "Calm",
+    "colour": "Blue",
+    "lucky_digit": 17,
+    "lucky_time": "8:12 AM"
+  },
+  {
+    "sign": "Cancer",
+    "date": "2026-04-05",
+    "caption": "Focus on your inner peace today. Meditation and reflection will yield profound results.",
+    "compatible_sign": "Taurus",
+    "mood": "Focused",
+    "colour": "Green",
+    "lucky_digit": 45,
+    "lucky_time": "3:45 PM"
+  },
+  {
+    "sign": "Cancer",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Aries",
+    "mood": "Focused",
+    "colour": "Orange",
+    "lucky_digit": 77,
+    "lucky_time": "7:11 PM"
+  },
+  {
+    "sign": "Leo",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Gemini",
+    "mood": "Romantic",
+    "colour": "Yellow",
+    "lucky_digit": 31,
+    "lucky_time": "6:59 PM"
+  },
+  {
+    "sign": "Leo",
+    "date": "2026-04-05",
+    "caption": "Focus on your inner peace today. Meditation and reflection will yield profound results.",
+    "compatible_sign": "Leo",
+    "mood": "Creative",
+    "colour": "Blue",
+    "lucky_digit": 55,
+    "lucky_time": "9:15 PM"
+  },
+  {
+    "sign": "Leo",
+    "date": "2026-04-05",
+    "caption": "Your communication skills are at a peak. It is a great time to pitch your bold ideas.",
+    "compatible_sign": "Aquarius",
+    "mood": "Energetic",
+    "colour": "Green",
+    "lucky_digit": 55,
+    "lucky_time": "11:43 AM"
+  },
+  {
+    "sign": "Virgo",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Aries",
+    "mood": "Energetic",
+    "colour": "Gold",
+    "lucky_digit": 51,
+    "lucky_time": "9:18 AM"
+  },
+  {
+    "sign": "Virgo",
+    "date": "2026-04-05",
+    "caption": "Balance in your diet and daily routine is extremely necessary right now. Prioritize self-care.",
+    "compatible_sign": "Leo",
+    "mood": "Reflective",
+    "colour": "Pink",
+    "lucky_digit": 32,
+    "lucky_time": "6:19 PM"
+  },
+  {
+    "sign": "Virgo",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Aquarius",
+    "mood": "Reflective",
+    "colour": "Green",
+    "lucky_digit": 78,
+    "lucky_time": "11:29 AM"
+  },
+  {
+    "sign": "Libra",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Virgo",
+    "mood": "Creative",
+    "colour": "Yellow",
+    "lucky_digit": 74,
+    "lucky_time": "4:16 AM"
+  },
+  {
+    "sign": "Libra",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Taurus",
+    "mood": "Reflective",
+    "colour": "Green",
+    "lucky_digit": 57,
+    "lucky_time": "6:27 PM"
+  },
+  {
+    "sign": "Libra",
+    "date": "2026-04-05",
+    "caption": "Balance in your diet and daily routine is extremely necessary right now. Prioritize self-care.",
+    "compatible_sign": "Pisces",
+    "mood": "Energetic",
+    "colour": "White",
+    "lucky_digit": 27,
+    "lucky_time": "5:11 AM"
+  },
+  {
+    "sign": "Scorpio",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Sagittarius",
+    "mood": "Joyful",
+    "colour": "Black",
+    "lucky_digit": 12,
+    "lucky_time": "9:21 AM"
+  },
+  {
+    "sign": "Scorpio",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Libra",
+    "mood": "Joyful",
+    "colour": "Blue",
+    "lucky_digit": 74,
+    "lucky_time": "8:46 PM"
+  },
+  {
+    "sign": "Scorpio",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Gemini",
+    "mood": "Calm",
+    "colour": "Pink",
+    "lucky_digit": 83,
+    "lucky_time": "4:10 PM"
+  },
+  {
+    "sign": "Sagittarius",
+    "date": "2026-04-05",
+    "caption": "Focus on your inner peace today. Meditation and reflection will yield profound results.",
+    "compatible_sign": "Taurus",
+    "mood": "Calm",
+    "colour": "Purple",
+    "lucky_digit": 48,
+    "lucky_time": "12:35 AM"
+  },
+  {
+    "sign": "Sagittarius",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Gemini",
+    "mood": "Calm",
+    "colour": "White",
+    "lucky_digit": 97,
+    "lucky_time": "9:36 AM"
+  },
+  {
+    "sign": "Sagittarius",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Pisces",
+    "mood": "Creative",
+    "colour": "Gold",
+    "lucky_digit": 85,
+    "lucky_time": "12:33 AM"
+  },
+  {
+    "sign": "Capricorn",
+    "date": "2026-04-05",
+    "caption": "You might uncover a hidden truth about a trusted friend. Process it before reacting.",
+    "compatible_sign": "Aquarius",
+    "mood": "Creative",
+    "colour": "Purple",
+    "lucky_digit": 64,
+    "lucky_time": "7:54 AM"
+  },
+  {
+    "sign": "Capricorn",
+    "date": "2026-04-05",
+    "caption": "Attention to a minor detail in your work could save you from significant trouble later.",
+    "compatible_sign": "Pisces",
+    "mood": "Romantic",
+    "colour": "Purple",
+    "lucky_digit": 34,
+    "lucky_time": "6:21 AM"
+  },
+  {
+    "sign": "Capricorn",
+    "date": "2026-04-05",
+    "caption": "You might uncover a hidden truth about a trusted friend. Process it before reacting.",
+    "compatible_sign": "Capricorn",
+    "mood": "Calm",
+    "colour": "Purple",
+    "lucky_digit": 39,
+    "lucky_time": "4:31 PM"
+  },
+  {
+    "sign": "Aquarius",
+    "date": "2026-04-05",
+    "caption": "Focus on your inner peace today. Meditation and reflection will yield profound results.",
+    "compatible_sign": "Scorpio",
+    "mood": "Romantic",
+    "colour": "Green",
+    "lucky_digit": 87,
+    "lucky_time": "9:27 AM"
+  },
+  {
+    "sign": "Aquarius",
+    "date": "2026-04-05",
+    "caption": "A creative block will finally lift, allowing you to express your true artistic vision.",
+    "compatible_sign": "Libra",
+    "mood": "Focused",
+    "colour": "White",
+    "lucky_digit": 66,
+    "lucky_time": "7:46 PM"
+  },
+  {
+    "sign": "Aquarius",
+    "date": "2026-04-05",
+    "caption": "A fantastic opportunity for financial gain may present itself, but you must move quickly.",
+    "compatible_sign": "Leo",
+    "mood": "Calm",
+    "colour": "Black",
+    "lucky_digit": 38,
+    "lucky_time": "8:52 PM"
+  },
+  {
+    "sign": "Pisces",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Aquarius",
+    "mood": "Calm",
+    "colour": "Purple",
+    "lucky_digit": 43,
+    "lucky_time": "2:59 AM"
+  },
+  {
+    "sign": "Pisces",
+    "date": "2026-04-05",
+    "caption": "Your communication skills are at a peak. It is a great time to pitch your bold ideas.",
+    "compatible_sign": "Cancer",
+    "mood": "Calm",
+    "colour": "Blue",
+    "lucky_digit": 47,
+    "lucky_time": "10:43 PM"
+  },
+  {
+    "sign": "Pisces",
+    "date": "2026-04-05",
+    "caption": "Today brings a sudden realization about a personal relationship. Use this clarity wisely.",
+    "compatible_sign": "Virgo",
+    "mood": "Joyful",
+    "colour": "Blue",
+    "lucky_digit": 80,
+    "lucky_time": "6:17 AM"
+  }
+]
