@@ -16,6 +16,36 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+// @desc    Update user profile & birth details
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            
+            if (req.body.birthDetails) {
+                user.birthDetails = { ...user.birthDetails, ...req.body.birthDetails };
+            }
+
+            const updatedUser = await user.save();
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                birthDetails: updatedUser.birthDetails,
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 // @desc    Get saved birth details
 // @route   GET /api/users/birth-details
 // @access  Private
@@ -71,6 +101,7 @@ const getChatHistory = async (req, res) => {
 
 module.exports = {
     getUserProfile,
+    updateUserProfile,
     getBirthDetails,
     getReports,
     getChatHistory

@@ -21,13 +21,6 @@ const features = [
     bgGlow: 'group-hover:shadow-[0_0_40px_rgba(138,43,226,0.3)]',
   },
   {
-    icon: Heart,
-    title: 'Compatibility Matching',
-    description: 'Discover your relationship dynamics with our advanced Kundli matching algorithm.',
-    color: 'text-cosmic-pink',
-    bgGlow: 'group-hover:shadow-[0_0_40px_rgba(255,105,180,0.3)]',
-  },
-  {
     icon: Calendar,
     title: 'Daily Horoscopes',
     description: 'Receive personalized daily, weekly, and monthly cosmic guidance for all zodiac signs.',

@@ -7,7 +7,6 @@ const Footer = () => {
   const footerLinks = {
     services: [
       { name: 'Birth Chart Reading', path: '/birth-chart' },
-      { name: 'Compatibility Analysis', path: '/compatibility' },
       { name: 'Daily Horoscope', path: '/horoscope' },
       { name: 'Book Consultation', path: '/booking' },
     ],

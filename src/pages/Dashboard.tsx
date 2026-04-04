@@ -33,11 +33,65 @@ const mockConsultations = [
 ];
 
 const DashboardPage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    birthDetails: {
+      date: (user as any)?.birthDetails?.date ? new Date((user as any).birthDetails.date).toISOString().split('T')[0] : '',
+      time: (user as any)?.birthDetails?.time || '',
+      place: (user as any)?.birthDetails?.place || ''
+    }
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'settings' && user) {
+        fetch('http://localhost:5000/api/users/profile', {
+            headers: { 'Authorization': `Bearer ${user.token}` }
+        }).then(res => res.json()).then(data => {
+            setFormData({
+                name: data.name || '',
+                email: data.email || '',
+                birthDetails: {
+                    date: data.birthDetails?.date ? new Date(data.birthDetails.date).toISOString().split('T')[0] : '',
+                    time: data.birthDetails?.time || '',
+                    place: data.birthDetails?.place || ''
+                }
+            });
+        });
+    }
+  }, [activeTab, user]);
+
+  const handleSaveSettings = async () => {
+    try {
+      setIsSaving(true);
+      const res = await fetch('http://localhost:5000/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        updateUser(data);
+        alert('Settings saved successfully!');
+      } else {
+        alert(data.message || 'Failed to save settings');
+      }
+    } catch (err) {
+      alert('Error saving settings');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -269,7 +323,8 @@ const DashboardPage = () => {
                       <label className="block text-sm text-muted-foreground mb-2">Full Name</label>
                       <input
                         type="text"
-                        defaultValue={mockUser.name}
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
                         className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
                       />
                     </div>
@@ -277,7 +332,8 @@ const DashboardPage = () => {
                       <label className="block text-sm text-muted-foreground mb-2">Email</label>
                       <input
                         type="email"
-                        defaultValue={mockUser.email}
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
                         className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
                       />
                     </div>
@@ -288,7 +344,8 @@ const DashboardPage = () => {
                         <label className="block text-sm text-muted-foreground mb-2">Date of Birth</label>
                         <input
                           type="date"
-                          defaultValue={mockUser.birthDetails.date}
+                          value={formData.birthDetails.date}
+                          onChange={(e) => setFormData({...formData, birthDetails: {...formData.birthDetails, date: e.target.value}})}
                           className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
                         />
                       </div>
@@ -296,7 +353,8 @@ const DashboardPage = () => {
                         <label className="block text-sm text-muted-foreground mb-2">Time of Birth</label>
                         <input
                           type="time"
-                          defaultValue={mockUser.birthDetails.time}
+                          value={formData.birthDetails.time}
+                          onChange={(e) => setFormData({...formData, birthDetails: {...formData.birthDetails, time: e.target.value}})}
                           className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
                         />
                       </div>
@@ -304,12 +362,15 @@ const DashboardPage = () => {
                         <label className="block text-sm text-muted-foreground mb-2">Place of Birth</label>
                         <input
                           type="text"
-                          defaultValue={mockUser.birthDetails.place}
+                          value={formData.birthDetails.place}
+                          onChange={(e) => setFormData({...formData, birthDetails: {...formData.birthDetails, place: e.target.value}})}
                           className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
                         />
                       </div>
                     </div>
-                    <button className="btn-cosmic">Save Changes</button>
+                    <button onClick={handleSaveSettings} disabled={isSaving} className="btn-cosmic">
+                      {isSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
                   </div>
                 </div>
               )}

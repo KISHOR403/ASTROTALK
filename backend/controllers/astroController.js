@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const BirthChart = require('../models/BirthChart');
+const Horoscope = require('../models/Horoscope');
 
 // @desc    Get AI-generated few-shot horoscope for a zodiac sign
 // @route   GET /api/astro/horoscope/:sign
@@ -9,6 +10,21 @@ const BirthChart = require('../models/BirthChart');
 const getHoroscope = async (req, res) => {
     try {
         const { sign } = req.params;
+        const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+        // 1. Check if we already have a generated horoscope for this sign today
+        let cachedHoroscope = await Horoscope.findOne({ sign: new RegExp(`^${sign}$`, 'i'), date: todayStr });
+        if (cachedHoroscope) {
+            return res.json({
+                sign: cachedHoroscope.sign,
+                daily: cachedHoroscope.daily,
+                mood: cachedHoroscope.mood,
+                colour: cachedHoroscope.colour,
+                lucky_number: cachedHoroscope.lucky_number,
+                compatible_sign: cachedHoroscope.compatible_sign
+            });
+        }
+
         const apiKey = process.env.GEMINI_API_KEY;
         
         if (!apiKey) {
@@ -55,6 +71,13 @@ const getHoroscope = async (req, res) => {
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         
         const parsedData = JSON.parse(responseText);
+
+        // Save to DB for caching
+        await Horoscope.create({
+            sign,
+            date: todayStr,
+            ...parsedData
+        });
 
         res.json({ sign, ...parsedData });
     } catch (error) {

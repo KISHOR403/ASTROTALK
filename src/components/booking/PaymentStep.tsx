@@ -48,15 +48,15 @@ const PaymentStep = ({ astrologer, selectedDate, selectedTime }: PaymentStepProp
           </div>
           <div className="flex justify-between py-2 border-b border-border">
             <span className="text-muted-foreground">Session Fee</span>
-            <span className="font-medium">${sessionPrice}</span>
+            <span className="font-medium">₹{sessionPrice}</span>
           </div>
           <div className="flex justify-between py-2 border-b border-border">
             <span className="text-muted-foreground">Platform Fee</span>
-            <span className="font-medium">${platformFee}</span>
+            <span className="font-medium">₹{platformFee}</span>
           </div>
           <div className="flex justify-between py-2 pt-3">
             <span className="font-display text-lg font-semibold">Total</span>
-            <span className="font-display text-2xl font-bold text-accent">${total}</span>
+            <span className="font-display text-2xl font-bold text-accent">₹{total}</span>
           </div>
         </div>
       </div>

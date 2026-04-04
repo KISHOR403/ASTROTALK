@@ -40,59 +40,76 @@ const ChatPage = () => {
 
   // Socket and History fetch
   useEffect(() => {
-    if (bookingId) {
-      // 1. Fetch History
-      const fetchHistory = async () => {
-        try {
-          const response = await fetch(`http://localhost:5000/api/chat/${bookingId}`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-          const data = await response.json();
-          // Transform backend message to frontend ChatMessage format
-          const transformed = data.map((m: any) => ({
-            id: m._id,
-            sender: m.sender._id === user?._id ? 'user' : 'astrologer',
-            senderName: m.sender.name,
-            text: m.text,
-            timestamp: new Date(m.createdAt),
-          }));
-          setMessages(transformed);
-        } catch (error) {
-          console.error('Error fetching history:', error);
+    if (!activeRoomId) return;
+
+    const isBot = activeRoomId.startsWith('bot-');
+
+    // 1. Fetch History if valid booking ID
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/chat/${activeRoomId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const data = await response.json();
+        // Transform backend message to frontend ChatMessage format
+        if (Array.isArray(data)) {
+            const transformed = data.map((m: any) => ({
+              id: m._id,
+              sender: m.sender._id === user?._id ? 'user' : 'astrologer',
+              senderName: m.sender.name,
+              text: m.text,
+              timestamp: new Date(m.createdAt),
+            }));
+            setMessages(transformed);
         }
-      };
+      } catch (error) {
+        console.error('Error fetching history:', error);
+      }
+    };
 
-      fetchHistory();
-
-      // 2. Join Room
-      socket.emit('join_room', bookingId);
-
-      // 3. Listen for Messages
-      socket.on('receive_message', (data) => {
-        const msg: ChatMessage = {
-          id: data._id,
-          sender: data.sender === user?._id ? 'user' : 'astrologer',
-          senderName: data.sender === user?._id ? 'You' : activeRoom.name,
-          text: data.text,
-          timestamp: new Date(data.createdAt),
-          avatar: data.sender === user?._id ? undefined : activeRoom.avatar
-        };
-        setMessages((prev) => [...prev, msg]);
-      });
-
-      return () => {
-        socket.off('receive_message');
-      };
+    if (!isBot && activeRoomId.length > 10) { // simple ObjectId check
+        fetchHistory();
+    } else {
+        setMessages([{
+            id: 'welcome-msg',
+            sender: 'astrologer',
+            senderName: activeRoom?.name || 'Bot',
+            text: 'Hello! I am here to guide you through the stars.',
+            timestamp: new Date(),
+            avatar: activeRoom?.avatar
+        }]);
     }
-  }, [bookingId, user?._id, activeRoom]);
+
+    // 2. Join Room
+    socket.emit('join_room', activeRoomId);
+
+    // 3. Listen for Messages
+    const rawHandler = (data: any) => {
+      const msg: ChatMessage = {
+        id: data._id || Date.now().toString(),
+        sender: data.sender === user?._id ? 'user' : 'astrologer',
+        senderName: data.sender === user?._id ? 'You' : (activeRoom?.name || 'Astrologer'),
+        text: data.text,
+        timestamp: new Date(data.createdAt || Date.now()),
+        avatar: data.sender === user?._id ? undefined : activeRoom?.avatar
+      };
+      setMessages((prev) => [...prev, msg]);
+    };
+
+    socket.on('receive_message', rawHandler);
+
+    return () => {
+      socket.off('receive_message', rawHandler);
+    };
+  }, [activeRoomId, user?._id, activeRoom]);
 
   const handleSend = (text: string) => {
-    if (!bookingId) return;
+    if (!activeRoomId) return;
 
     const data = {
-      roomId: bookingId,
+      roomId: activeRoomId,
       sender: user?._id,
       text
     };

@@ -11,7 +11,6 @@ const navLinks = [
   { name: 'Home', path: '/' },
   { name: 'Horoscope', path: '/horoscope' },
   { name: 'Birth Chart', path: '/birth-chart' },
-  { name: 'Compatibility', path: '/compatibility' },
   { name: 'Book Consultation', path: '/booking' },
   { name: 'Blog', path: '/blog' },
   { name: 'Chat', path: '/chat' },

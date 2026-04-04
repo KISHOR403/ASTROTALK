@@ -6,7 +6,6 @@ import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Horoscope from "./pages/Horoscope";
 import BirthChart from "./pages/BirthChart";
-import Compatibility from "./pages/Compatibility";
 import Booking from "./pages/Booking";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -40,7 +39,6 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/horoscope" element={<Horoscope />} />
         <Route path="/birth-chart" element={<BirthChart />} />
-        <Route path="/compatibility" element={<Compatibility />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/contact" element={<Contact />} />

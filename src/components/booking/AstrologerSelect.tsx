@@ -79,7 +79,7 @@ const AstrologerSelect = ({ astrologers, selectedId, onSelect }: AstrologerSelec
               {/* Price badge */}
               <div className="text-right shrink-0">
                 <span className="font-display text-lg font-bold text-accent">
-                  ${Math.round(ast.pricePerMinute * 60 / 100 * 1.5)}
+                  ₹{Math.round(ast.pricePerMinute * 60 / 100 * 1.5)}
                 </span>
                 <p className="text-[11px] text-muted-foreground">per session</p>
               </div>
