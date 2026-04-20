@@ -74,9 +74,9 @@ const ChatPage = () => {
     } else {
         setMessages([{
             id: 'welcome-msg',
-            sender: 'astrologer',
-            senderName: activeRoom?.name || 'Bot',
-            text: 'Hello! I am here to guide you through the stars.',
+            sender: 'bot',
+            senderName: 'AstroBot',
+            text: 'Namaste! \ud83d\ude4f I\'m your AstroBot \u2014 ask me about your zodiac sign, horoscope, compatibility, planetary positions, or anything cosmic!',
             timestamp: new Date(),
             avatar: activeRoom?.avatar
         }]);
@@ -87,9 +87,12 @@ const ChatPage = () => {
 
     // 3. Listen for Messages
     const rawHandler = (data: any) => {
+      let resolvedSender: MessageSender = data.sender === user?._id ? 'user' : 'astrologer';
+      if (data.sender === 'bot') resolvedSender = 'bot';
+
       const msg: ChatMessage = {
         id: data._id || Date.now().toString(),
-        sender: data.sender === user?._id ? 'user' : 'astrologer',
+        sender: resolvedSender,
         senderName: data.sender === user?._id ? 'You' : (activeRoom?.name || 'Astrologer'),
         text: data.text,
         timestamp: new Date(data.createdAt || Date.now()),
@@ -98,10 +101,22 @@ const ChatPage = () => {
       setMessages((prev) => [...prev, msg]);
     };
 
+    const chunkHandler = (data: any) => {
+      setMessages((prev) => 
+        prev.map((msg) => 
+          msg.id === data._id 
+            ? { ...msg, text: msg.text + data.chunk }
+            : msg
+        )
+      );
+    };
+
     socket.on('receive_message', rawHandler);
+    socket.on('receive_message_chunk', chunkHandler);
 
     return () => {
       socket.off('receive_message', rawHandler);
+      socket.off('receive_message_chunk', chunkHandler);
     };
   }, [activeRoomId, user?._id, activeRoom]);
 
@@ -111,7 +126,11 @@ const ChatPage = () => {
     const data = {
       roomId: activeRoomId,
       sender: user?._id,
-      text
+      text,
+      history: messages.slice(-6).map(m => ({
+        role: m.sender === 'user' ? 'user' : 'bot',
+        text: m.text
+      }))
     };
 
     socket.emit('send_message', data);
@@ -139,7 +158,7 @@ const ChatPage = () => {
 
           <div className="flex-1 flex flex-col glass-card md:rounded-l-none md:rounded-r-xl">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-accent/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-cosmic flex items-center justify-center text-lg">
                   {activeRoom.avatar}
@@ -147,7 +166,7 @@ const ChatPage = () => {
                 <div>
                   <h3 className="font-display text-sm font-semibold">{activeRoom.name}</h3>
                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Wifi className="w-3 h-3 text-success" /> Online
+                    <span className="w-2 h-2 rounded-full bg-success inline-block" /> Online
                   </span>
                 </div>
               </div>
