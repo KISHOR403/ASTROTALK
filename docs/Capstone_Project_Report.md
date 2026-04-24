@@ -5,6 +5,19 @@
 
 ---
 
+# DECLARATION
+
+We hereby declare that the project work entitled **"Vedic AI Astrology & Real-Time Consultation Platform"** is an authentic record of our own work carried out as requirements of Capstone Project for the award of B.Tech degree in Computer Science and Engineering from Lovely Professional University, Phagwara, under the guidance of Dr. Varun Dogra, during January to May 2026. All the information furnished in this capstone project report is based on our own intensive work and is genuine.
+
+**Submitted By:**  
+[Student Name / Registration Number]  
+[Student Name / Registration Number]  
+*(Please replace the brackets with your actual names and registration numbers)*
+
+**Date:** _______________
+
+---
+
 # 1. Introduction
 
 ## 1.1 Objective of the Project
