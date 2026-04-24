@@ -597,6 +597,25 @@ Non-functional testing evaluates the system's readiness in terms of performance,
 | TC-NF-04 | Security | Attempt SQL/NoSQL injection in the login endpoint payload. | Mongoose sanitizes inputs; login fails without compromising database. | Pass |
 | TC-NF-05 | Security | Intercept network traffic during payment checkout. | Credit card details are exclusively handled by Razorpay's iframe; no sensitive data touches the backend. | Pass |
 | TC-NF-06 | Usability | Render the Astrologer Dashboard on a 375px mobile viewport. | All charts, tables, and navigation elements scale appropriately without horizontal scrolling. | Pass |
+## 8.3 Testing Methodologies & Automation
+
+To ensure continuous stability across development iterations, a multi-layered testing methodology was adopted:
+
+### 8.3.1 Smoke Testing
+Before any major deployment to the staging environment, a rapid suite of Smoke Tests is executed. This ensures that critical infrastructure—such as database connectivity, external API reachability (Google Gemini, Razorpay), and the Python Microservice health—is fully operational. If the smoke tests fail, the build is immediately halted.
+
+### 8.3.2 Regression Testing
+As new features (such as real-time chat and payment gateways) were integrated, comprehensive Regression Testing was performed. This guaranteed that newly introduced code did not negatively impact the existing, stable core modules (such as Authentication and Kundali generation).
+
+### 8.3.3 Automated UI Testing via Selenium WebDriver
+To simulate real-world user interactions across the application's critical paths, **Selenium WebDriver** was utilized for Automated UI Testing. 
+
+| Automated Test Scenario | Selenium Action Sequence | Validation Point |
+|---|---|---|
+| E2E Booking Flow | Navigate to directory -> Click Astrologer -> Select Time -> Submit | Verifies successful redirection to the Razorpay checkout widget. |
+| AI Chatbot Responsiveness | Login -> Open Chat -> Input Birth Details -> Send | Validates that the UI successfully renders the streamed Gemini AI text chunks dynamically. |
+| Dashboard State | Login as Astrologer -> Toggle Availability -> Refresh Page | Asserts that the 'Online' status indicator persists across sessions. |
+
 ---
 
 # 9. Conclusion
