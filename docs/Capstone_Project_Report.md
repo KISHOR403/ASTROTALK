@@ -550,39 +550,53 @@ gantt
 
 The software testing phase ensures that all core functionalities of the Vedic AI Astrology Platform operate reliably under expected conditions. Test cases focus on verifying the integration between the user interface, backend APIs, and external microservices.
 
-## 8.1 Authentication and Role Management Tests
+## 8.1 Functional Testing
+
+Functional testing ensures that the system behaves as specified in the functional requirements.
+
+### 8.1.1 Authentication & Role Management
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
-| TC-AUTH-01 | User Registration | Submit registration form with valid email and strong password. | Account is created, password is hashed via bcrypt, and user is redirected to login. | Pass |
-| TC-AUTH-02 | Role Assignment | Register as 'Astrologer' and verify database role constraint. | The `role` field in MongoDB is explicitly set to 'astrologer'. | Pass |
-| TC-AUTH-03 | JWT Authorization | Access protected `/api/users/profile` without a Bearer token. | System returns `401 Unauthorized`. | Pass |
+| TC-F-01 | User Registration | Submit registration form with valid email and strong password. | Account is created, password is hashed via bcrypt, and user is redirected to login. | Pass |
+| TC-F-02 | Role Assignment | Register as 'Astrologer' and verify database role constraint. | The `role` field in MongoDB is explicitly set to 'astrologer'. | Pass |
+| TC-F-03 | JWT Authorization | Access protected `/api/users/profile` without a Bearer token. | System returns `401 Unauthorized`. | Pass |
 
-## 8.2 AI Horoscope & Kundali Engine Tests
-
-| Test Case ID | Feature | Description | Expected Result | Status |
-|---|---|---|---|---|
-| TC-KUND-01 | Ephemeris Calculation | Submit valid birth date, time, and coordinates to the Python microservice. | Microservice returns accurate Navagraha planetary degrees within 2000ms. | Pass |
-| TC-KUND-02 | Geocoding Fallback | Submit an invalid or unrecognized city name for birth chart. | System catches error and defaults to standard coordinates, logging a warning. | Pass |
-| TC-AI-01 | Gemini Prompting | Request daily horoscope generation for a specific Zodiac sign. | Gemini returns structured JSON matching the few-shot template. | Pass |
-| TC-AI-02 | AI API Timeout | Simulate a timeout from the Google Gemini API. | System gracefully catches the error and returns a predefined deterministic fallback horoscope. | Pass |
-
-## 8.3 Booking and Payment System Tests
+### 8.1.2 Astrology Engine & AI Integration
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
-| TC-BOOK-01 | Slot Selection | Client attempts to book an already occupied astrologer time slot. | Frontend displays error message; backend rejects request with `409 Conflict`. | Pass |
-| TC-PAY-01 | Order Creation | Client proceeds to checkout for a standard consultation. | Backend generates a unique Razorpay `order_id` matching the consultation price. | Pass |
-| TC-PAY-02 | Signature Verification | Submit mocked valid Razorpay payment signature to verification endpoint. | Backend computes HMAC SHA-256, verifies match, and updates booking status to 'paid'. | Pass |
+| TC-F-04 | Ephemeris Calculation | Submit valid birth date, time, and coordinates to the Python microservice. | Microservice returns accurate Navagraha planetary degrees. | Pass |
+| TC-F-05 | Gemini Prompting | Request daily horoscope generation for a specific Zodiac sign. | Gemini returns structured JSON matching the few-shot template. | Pass |
+| TC-F-06 | Geocoding Fallback | Submit an invalid or unrecognized city name for birth chart. | System catches error and defaults to standard coordinates. | Pass |
 
-## 8.4 Real-Time Chat (WebSocket) Tests
+### 8.1.3 Booking, Payments & Chat
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
-| TC-CHAT-01 | Room Isolation | Two different clients join separate chat rooms (`bookingId`). | Messages sent in Room A are not broadcasted to Room B. | Pass |
-| TC-CHAT-02 | Message Persistence | Client sends a message; connection is artificially dropped and reconnected. | Reconnecting client successfully fetches chat history from MongoDB via REST API. | Pass |
-| TC-CHAT-03 | Live Notifications | Client completes a payment for a consultation. | Astrologer receives a real-time `new_notification` event on their dashboard. | Pass |
+| TC-F-07 | Order Creation | Client proceeds to checkout for a standard consultation. | Backend generates a unique Razorpay `order_id` matching the consultation price. | Pass |
+| TC-F-08 | Signature Verification | Submit mocked valid Razorpay payment signature to verification endpoint. | Backend computes HMAC SHA-256, verifies match, and updates status to 'paid'. | Pass |
+| TC-F-09 | Room Isolation | Two different clients join separate chat rooms (`bookingId`). | Messages sent in Room A are not broadcasted to Room B. | Pass |
 
+## 8.2 Non-Functional Testing
+
+Non-functional testing evaluates the system's readiness in terms of performance, security, usability, and reliability.
+
+### 8.2.1 Performance & Reliability
+
+| Test Case ID | Category | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-NF-01 | Performance | Measure round-trip time for AI Horoscope generation. | Response is received and rendered within 5-7 seconds. | Pass |
+| TC-NF-02 | Performance | Measure WebSocket message delivery latency between clients. | Message appears on recipient's screen in under 200ms. | Pass |
+| TC-NF-03 | Reliability | Simulate a timeout/failure from the Google Gemini API. | System gracefully catches the error and returns a predefined deterministic fallback horoscope. | Pass |
+
+### 8.2.2 Security & Usability
+
+| Test Case ID | Category | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-NF-04 | Security | Attempt SQL/NoSQL injection in the login endpoint payload. | Mongoose sanitizes inputs; login fails without compromising database. | Pass |
+| TC-NF-05 | Security | Intercept network traffic during payment checkout. | Credit card details are exclusively handled by Razorpay's iframe; no sensitive data touches the backend. | Pass |
+| TC-NF-06 | Usability | Render the Astrologer Dashboard on a 375px mobile viewport. | All charts, tables, and navigation elements scale appropriately without horizontal scrolling. | Pass |
 ---
 
 # 9. Conclusion
