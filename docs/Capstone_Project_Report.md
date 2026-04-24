@@ -108,42 +108,100 @@ graph TD
     UC7 -.->|Enables| UC8
 ```
 
+
 ---
 
-# 2. System Description
+# 2. PROFILE OF THE PROBLEM – RATIONALE / SCOPE OF THE STUDY
 
-## 2.1 Customer / User Profiles
+Traditional Vedic astrology relies on complex astronomical calculations (Kundali generation) and interpretation by experienced practitioners. Currently, seekers of astrological guidance must rely on fragmented ecosystems: either fully automated apps that provide generic, non-interactive horoscopes, or manual booking of human astrologers which can be costly and lack immediate availability. 
 
-Understanding the target audience is crucial for designing an intuitive user interface and aligning system features with user needs.
+The rationale for this study is to bridge the gap between high-precision traditional astrological mathematics and modern Generative AI. By leveraging the Swiss Ephemeris and Google's Gemini LLM, we can democratize access to instant, highly personalized interpretations, while simultaneously providing a real-time marketplace (via WebSockets and Razorpay) for users who require deeper, human expert consultation. The scope encompasses the development of a full-stack platform acting as both an automated AI oracle and a peer-to-peer consultation booking system.
 
-**Profile 1: The Client (Service Seeker)**
-- **Demographics:** Individuals spanning various age groups (typically 18–65) who hold an interest in spirituality, self-discovery, and traditional astrological guidance.
-- **Technical Proficiency:** Ranging from novice to intermediate. They require a frictionless, aesthetically pleasing, and highly intuitive navigation experience.
-- **Primary Goals:** To obtain accurate astrological readings, explore their birth charts, and seek personalized, confidential advice from human experts regarding significant life events such as career choices, relationships, and health.
+---
 
-**Profile 2: The Astrologer (Service Provider)**
-- **Demographics:** Certified and experienced practitioners of Vedic astrology.
-- **Technical Proficiency:** Generally novice. They require a straightforward, professional dashboard that clearly displays upcoming appointments, active chat windows, and financial metrics without overwhelming technical complexity.
-- **Primary Goals:** To monetize their expertise, expand their digital footprint, efficiently manage their consultation schedule, and communicate reliably with clients.
+# 3. EXISTING SYSTEM
 
-## 2.2 Assumptions and Dependencies
+## 3.1 Introduction
+The existing ecosystem of astrological services is largely divided into two extreme categories: entirely manual offline consultations or generic automated websites.
 
-**Assumptions:**
-- Users possess reliable internet connectivity and modern web browsers.
-- Clients have access to valid digital payment methods (Credit/Debit cards, UPI, NetBanking) supported by the integrated gateway.
-- Users provide accurate birth details, as the precision of the generated Kundali is heavily reliant on the exactness of the input data.
+## 3.2 Existing Software
+Existing platforms like generalized horoscope sites provide daily readings based on Sun signs but lack the mathematical rigor of generating exact Navagraha positions based on precise geographical coordinates. Alternatively, platforms linking users to astrologers often suffer from high latency in communication, lack of an integrated chat interface, or poor user experience. 
 
-**System Dependencies:**
+## 3.3 DFD for Present System
+In the existing manual system, a user manually searches for an astrologer, emails birth details, waits days for a chart calculation, and coordinates payment offline. 
 
-| Dependency | Purpose in System | Impact of Unavailability |
-|------------|-------------------|--------------------------|
-| **Google Gemini API** | Natural language generation for horoscopes and Kundali interpretations. | System falls back to generalized, deterministic text responses. |
-| **Razorpay API** | Secure processing of financial transactions. | Clients cannot complete bookings; consultations cannot commence. |
-| **Swiss Ephemeris (pyswisseph)** | High-precision planetary position calculations via Python microservice. | The core Kundali generation feature fails to produce charts. |
-| **MongoDB Atlas** | Primary cloud database for storing all user, booking, and chat data. | The entire application becomes non-functional. |
-| **Nominatim Geocoding** | Translating city names into latitude/longitude coordinates. | System defaults to a standard coordinate (e.g., New Delhi), slightly reducing chart accuracy for other locations. |
+## 3.4 What Is New in the System to Be Developed
+Our system introduces:
+1. **Real-Time AI Microservice:** Instantly computes precise Kundali charts using Python and translates them via Gemini AI.
+2. **Integrated Real-Time Chat:** A Socket.io architecture allowing users to instantly text astrologers post-payment.
+3. **Automated Verification:** Secure payment gateway integration directly modifying booking states without manual intervention.
 
-## 2.3 Functional Requirements
+---
+
+# 4. PROBLEM ANALYSIS
+
+## 4.1 Product Definition
+The product is a Single Page Application (SPA) utilizing the MERN stack and a Python microservice, designed to provide AI-driven astrological insights and facilitate secure, real-time communication between clients and verified astrologers.
+
+## 4.2 Feasibility Analysis
+
+### 4.2.1 Technical Feasibility
+The project is highly technically feasible. Node.js efficiently handles WebSocket connections, React provides a responsive UI, and Python handles the mathematical load using the well-documented `pyswisseph` library.
+
+### 4.2.2 Economic Feasibility
+The system is economically viable as it relies on open-source frameworks (React, Express, Flask) and freemium cloud tiers (MongoDB Atlas, Google Gemini API free tier, Razorpay test mode) during development. 
+
+### 4.2.3 Operational Feasibility
+The intuitive dashboard design ensures that astrologers (who may have low technical proficiency) can easily manage their availability and bookings, proving the system operationally sound.
+
+## 4.3 Project Plan
+
+The development lifecycle is managed using Agile methodologies, broken down into sequential, two-week sprints.
+
+| Phase | Sprint Focus | Key Deliverables | Duration | Est. Hours |
+|-------|--------------|------------------|----------|------------|
+| Phase 1 | Planning & Setup | Requirements gathering, Architectural design, Database Schema formulation, CI/CD pipeline setup. | Weeks 1–2 | 80 hrs |
+| Phase 2 | Core Infrastructure | User Authentication (JWT), Express.js REST API boilerplate, React Router implementation. | Weeks 3–4 | 90 hrs |
+| Phase 3 | AI & Astrology Engine | Python microservice integration, Gemini AI prompt engineering, Kundali chart rendering UI. | Weeks 5–6 | 110 hrs |
+| Phase 4 | The Marketplace | Astrologer public profiles, search and filtering logic, Booking calendar component. | Weeks 7–8 | 100 hrs |
+| Phase 5 | Payments & Comm. | Razorpay API integration, Socket.io real-time chat architecture, message persistence. | Weeks 9–10 | 120 hrs |
+| Phase 6 | Finalization & Deployment| Dashboard analytics, comprehensive bug fixing, User Acceptance Testing (UAT), Cloud deployment. | Weeks 11–12| 80 hrs |
+| **Total** | | | **12 Weeks** | **580 Hrs** |
+
+### 7.1 Gantt Chart Representation
+
+```mermaid
+gantt
+    title Capstone Project Development Timeline
+    dateFormat YYYY-MM-DD
+    section Phase 1
+    Planning & Architecture        :done, p1, 2026-05-01, 14d
+    section Phase 2
+    Core API & Authentication      :done, p2, 2026-05-15, 14d
+    section Phase 3
+    Astrology Engine & AI          :done, p3, 2026-05-29, 14d
+    section Phase 4
+    Directory & Booking System     :done, p4, 2026-06-12, 14d
+    section Phase 5
+    Razorpay & WebSocket Chat      :done, p5, 2026-06-26, 14d
+    section Phase 6
+    Testing & Cloud Deployment     :done, p6, 2026-07-10, 14d
+```
+
+
+---
+
+# 5. SOFTWARE REQUIREMENT ANALYSIS
+
+## 5.1 Introduction
+This section details the functional and non-functional specifications that the system must adhere to.
+
+## 5.2 General Description
+The system operates securely using JWT authentication, segregating user roles into Clients and Astrologers to protect sensitive consultation data.
+
+## 5.3 Specific Requirements
+
+## 5.3.1 Functional Requirements
 
 Functional requirements define the specific behaviors and capabilities the system must possess to satisfy user needs.
 
@@ -164,7 +222,7 @@ Functional requirements define the specific behaviors and capabilities the syste
 | FR-13 | Dashboard | The system shall allow astrologers to dynamically manage their availability calendar and edit their public profiles. | Medium |
 | FR-14 | Notifications | The system shall push real-time WebSocket notifications to astrologers upon the receipt of new bookings and successful payments. | High |
 
-## 2.4 Non-Functional Requirements
+## 5.3.2 Non-Functional Requirements
 
 Non-functional requirements specify the quality attributes, performance goals, and security constraints of the system.
 
@@ -179,169 +237,14 @@ Non-functional requirements specify the quality attributes, performance goals, a
 | NFR-07 | Usability | The user interface must employ responsive design principles to ensure seamless operation across desktop, tablet, and mobile devices. |
 | NFR-08 | Scalability | The backend shall utilize a stateless authentication model (JWT) to facilitate effortless horizontal scaling of Node.js instances as user traffic grows. |
 
----
-
-# 3. Technology Stack and Architecture
-
-The platform is engineered using a robust, modern technology stack designed for high performance, rapid development, and scalability. The architecture is primarily divided into a Frontend client, a Backend server, and a specialized Microservice.
-
-## 3.1 Frontend Technology Stack
-
-The client-side application is responsible for rendering the user interface and managing state.
-
-- **React.js (v18):** A declarative, component-based JavaScript library used for building dynamic user interfaces. It ensures efficient DOM updates and a smooth single-page application experience.
-- **TypeScript:** Adds static typing to JavaScript, enhancing code quality, readability, and significantly reducing runtime errors during development.
-- **Vite:** A next-generation frontend tooling solution that provides extremely fast hot module replacement (HMR) and optimized build processes.
-- **Tailwind CSS & ShadCN UI:** A utility-first CSS framework combined with beautifully designed, accessible UI components. This combination allows for rapid, consistent styling without writing custom CSS files.
-- **Socket.io-client:** Enables real-time, bidirectional, event-based communication with the server for the live chat and notification features.
-
-## 3.2 Backend Technology Stack
-
-The server-side application handles business logic, database interactions, and API integrations.
-
-- **Node.js & Express.js:** Node.js provides a fast, asynchronous, event-driven JavaScript runtime environment. Express.js acts as a minimal and flexible web application framework, simplifying route management and middleware integration.
-- **MongoDB & Mongoose:** MongoDB serves as the primary NoSQL database, offering high flexibility for storing complex, hierarchical astrological data. Mongoose provides a rigorous schema-based solution to model application data.
-- **Socket.io:** The server counterpart for managing WebSocket connections, handling chat rooms, and broadcasting real-time events to connected clients.
-- **Google Gemini API:** Integrates advanced Large Language Models (gemini-2.5-flash) to perform natural language processing and generate dynamic astrological content.
-
-## 3.3 Microservice Technology Stack
-
-A dedicated microservice handles computationally expensive astronomical calculations to prevent blocking the main Node.js event loop.
-
-- **Python & Flask:** A lightweight web application framework in Python used to expose astronomical calculation functions as RESTful API endpoints.
-- **Swiss Ephemeris (pyswisseph):** A highly accurate planetary calculation library widely regarded as the industry standard among professional astrologers. It computes exact planetary longitudes and house systems required for authentic Vedic astrology.
-
-## 3.4 Technology Stack Working Diagram
-
-The following diagram illustrates how these technologies interact to fulfill a user request, specifically highlighting the separation of concerns between the frontend, the main backend API, and the specialized microservice.
-
-```mermaid
-graph TD
-    subgraph Client Tier
-        UI[React.js UI Components]
-        State[TypeScript Logic]
-        Tailwind[Tailwind CSS Styling]
-        SocketClient[Socket.io-client]
-    end
-
-    subgraph Application Tier Node.js
-        Express[Express.js REST API]
-        SocketServer[Socket.io Server]
-        Auth[JWT Authentication]
-        Controllers[Business Logic Controllers]
-    end
-
-    subgraph Data Tier
-        MongoDB[(MongoDB Atlas)]
-    end
-
-    subgraph Microservice Tier Python
-        Flask[Flask API API]
-        SwissEph[Swiss Ephemeris Engine]
-    end
-
-    subgraph External APIs
-        Gemini[[Google Gemini AI]]
-        Razorpay[[Razorpay Gateway]]
-    end
-
-    UI <-->|HTTP GET/POST| Express
-    SocketClient <-->|WebSockets| SocketServer
-    
-    Express --> Auth
-    Auth --> Controllers
-    Controllers <-->|Read/Write Documents| MongoDB
-    
-    Controllers <-->|Calculates Planetary Data| Flask
-    Flask <--> SwissEph
-    
-    Controllers <-->|Sends Context, Receives Interpretation| Gemini
-    Controllers <-->|Creates Order, Verifies Signature| Razorpay
-```
-
-**Explanation of the Workflow:**
-When a user requests a Birth Chart, the **React frontend** sends the birth details via an HTTP request to the **Express.js backend**. The backend immediately delegates the heavy mathematical calculations to the **Python Flask Microservice**, which utilizes the **Swiss Ephemeris**. Once the precise planetary coordinates are returned, the Express backend formats this data into a structured prompt and sends it to the **Google Gemini API**. Gemini processes the prompt and returns a comprehensive, human-readable astrological interpretation. Finally, the Express backend saves the complete package to **MongoDB** and returns it to the React frontend for display.
 
 ---
 
-# 4. System Design
+# 6. DESIGN
 
-## 4.1 Entity-Relationship (E-R) Diagram
+## 6.1 System Design
 
-The Entity-Relationship diagram outlines the logical structure of the database, illustrating the primary entities and the relationships connecting them.
-
-```mermaid
-erDiagram
-    USER ||--o{ BOOKING : "creates"
-    USER ||--o{ BIRTH_CHART : "generates"
-    USER ||--|| ASTROLOGER : "registered as"
-    
-    ASTROLOGER ||--o{ BOOKING : "receives"
-    
-    BOOKING ||--o{ MESSAGE : "contains"
-    USER ||--o{ MESSAGE : "sends"
-
-    USER {
-        ObjectId _id PK
-        String name
-        String email UK
-        String password
-        String role "client|astrologer"
-        Object birthDetails
-        Date createdAt
-    }
-
-    ASTROLOGER {
-        ObjectId _id PK
-        ObjectId user FK
-        String title
-        Array specializations
-        Number experience
-        Number pricePerMinute
-        String bio
-        Boolean isAvailable
-    }
-
-    BOOKING {
-        ObjectId _id PK
-        ObjectId user FK
-        ObjectId astrologer FK
-        Date startTime
-        Number duration
-        String status "scheduled|completed|cancelled"
-        Number price
-        String paymentStatus "pending|paid|failed"
-    }
-
-    MESSAGE {
-        ObjectId _id PK
-        ObjectId booking FK
-        ObjectId sender FK
-        String text
-        Date createdAt
-    }
-
-    BIRTH_CHART {
-        ObjectId _id PK
-        ObjectId user FK
-        String dateOfBirth
-        String timeOfBirth
-        String location
-        String coordinates
-        Mixed chartData
-    }
-
-    HOROSCOPE {
-        ObjectId _id PK
-        String sign
-        String date
-        String daily
-        String mood
-        String colour
-    }
-```
-
-## 4.2 Data Flow Diagrams (DFDs)
+Data Flow Diagrams provide a graphical representation:
 
 Data Flow Diagrams provide a graphical representation of the flow of data through the information system, modeling its process aspects.
 
@@ -428,9 +331,94 @@ sequenceDiagram
     Backend-->>Frontend: Verification Success → Redirect to Chat Room
 ```
 
----
 
-# 5. Database Design
+## 6.2 Design Notations
+
+The following notations and diagrams, including the Entity-Relationship Diagram, illustrate the logical structure:
+
+The Entity-Relationship diagram outlines the logical structure of the database, illustrating the primary entities and the relationships connecting them.
+
+```mermaid
+erDiagram
+    USER ||--o{ BOOKING : "creates"
+    USER ||--o{ BIRTH_CHART : "generates"
+    USER ||--|| ASTROLOGER : "registered as"
+    
+    ASTROLOGER ||--o{ BOOKING : "receives"
+    
+    BOOKING ||--o{ MESSAGE : "contains"
+    USER ||--o{ MESSAGE : "sends"
+
+    USER {
+        ObjectId _id PK
+        String name
+        String email UK
+        String password
+        String role "client|astrologer"
+        Object birthDetails
+        Date createdAt
+    }
+
+    ASTROLOGER {
+        ObjectId _id PK
+        ObjectId user FK
+        String title
+        Array specializations
+        Number experience
+        Number pricePerMinute
+        String bio
+        Boolean isAvailable
+    }
+
+    BOOKING {
+        ObjectId _id PK
+        ObjectId user FK
+        ObjectId astrologer FK
+        Date startTime
+        Number duration
+        String status "scheduled|completed|cancelled"
+        Number price
+        String paymentStatus "pending|paid|failed"
+    }
+
+    MESSAGE {
+        ObjectId _id PK
+        ObjectId booking FK
+        ObjectId sender FK
+        String text
+        Date createdAt
+    }
+
+    BIRTH_CHART {
+        ObjectId _id PK
+        ObjectId user FK
+        String dateOfBirth
+        String timeOfBirth
+        String location
+        String coordinates
+        Mixed chartData
+    }
+
+    HOROSCOPE {
+        ObjectId _id PK
+        String sign
+        String date
+        String daily
+        String mood
+        String colour
+    }
+```
+
+
+## 6.3 Detailed Design
+
+### 6.3.1 Frontend Component Architecture
+The React frontend is constructed using atomic design principles, grouping components into Pages (Dashboard, Booking), Layouts (Navbars), and UI Elements (Buttons, Modals).
+
+### 6.3.2 Backend Module Structure
+The Express.js backend follows the Model-View-Controller (MVC) pattern, separating routing logic, business controllers, and Mongoose database schemas.
+
+### 6.3.3 Database Structure
 
 The system utilizes MongoDB, a NoSQL database, allowing for flexible, document-oriented storage which is highly suitable for hierarchical data structures like astrological charts. Below are the data dictionary definitions for the core collections.
 
@@ -485,89 +473,73 @@ The system utilizes MongoDB, a NoSQL database, allowing for flexible, document-o
 | `text` | String | The plaintext content of the message | Required |
 | `createdAt` | Date | Timestamp of when the message was dispatched | Auto-generated (Mongoose) |
 
----
 
-# 6. Implementation Details
+## 6.4 Flowcharts
+*(Flowcharts depicting the user registration, AI query processing, and payment checkout flow are integrated within the system documentation).*
 
-## 6.1 Application Programming Interface (API)
+## 6.5 Pseudo Code
 
-The backend exposes a RESTful API to handle all client-server communications securely.
+### 6.5.1 Kundali Calculation Logic
+```text
+FUNCTION calculateKundali(dob, time, location):
+    coordinates = Geocode(location)
+    IF Geocode fails:
+        RETURN default_coordinates
+    planetary_data = call_python_microservice(dob, time, coordinates)
+    RETURN planetary_data
+```
 
-| HTTP Method | API Endpoint Route | Authentication | Description |
-|-------------|--------------------|----------------|-------------|
-| POST | `/api/auth/register` | None | Registers a new user account. |
-| POST | `/api/auth/login` | None | Authenticates user and issues a JWT. |
-| GET | `/api/users/profile` | Required | Retrieves the authenticated user's profile. |
-| PUT | `/api/users/profile` | Required | Updates user details and saved birth data. |
-| GET | `/api/astro/horoscope/:sign` | None | Fetches or generates the daily AI horoscope for a sign. |
-| POST | `/api/astro/birth-chart` | None | Initiates the complex Kundali generation workflow. |
-| GET | `/api/astrologers` | None | Retrieves the public directory of all active astrologers. |
-| GET | `/api/astrologers/dashboard`| Astrologer | Fetches aggregate analytics for the astrologer dashboard. |
-| PUT | `/api/astrologers/availability`| Astrologer | Toggles online presence and defines working slots. |
-| POST | `/api/bookings` | Client | Creates a new consultation booking request. |
-| PATCH | `/api/bookings/:id/pay` | Client | Modifies booking state upon successful payment. |
-| POST | `/api/payment/create-order` | Client | Interacts with Razorpay to initiate a transaction. |
-| POST | `/api/payment/verify` | Client | Validates the cryptographic signature returned by Razorpay. |
-| GET | `/api/chat/:bookingId` | Participant | Retrieves historical chat transcripts for a specific session. |
+### 6.5.2 Gemini AI Prompt Generation
+```text
+FUNCTION generateHoroscope(zodiac_sign):
+    prompt = "Generate a daily Vedic horoscope for " + zodiac_sign
+    response = call_gemini_api(prompt, few_shot_examples)
+    RETURN response.text
+```
 
-## 6.2 WebSocket Event Architecture
-
-Real-time capabilities are facilitated by an event-driven WebSocket architecture utilizing Socket.io.
-
-| Event Name | Direction | Payload Structure | Functionality |
-|------------|-----------|-------------------|---------------|
-| `join_room` | Client → Server | `roomId` (String) | Subscribes a user to a specific consultation communication channel. |
-| `send_message` | Client → Server | `{roomId, sender, text}` | Transmits a new message payload to the server for distribution. |
-| `receive_message` | Server → Client | `{_id, sender, text, createdAt}` | Broadcasts the persisted message to all connected peers in the room. |
-| `new_notification`| Server → Client | `{type, message, bookingId}` | Pushes immediate alerts regarding new bookings or payment confirmations to the astrologer UI. |
-
----
-
-# 7. Scheduling and Project Management
-
-The development lifecycle is managed using Agile methodologies, broken down into sequential, two-week sprints.
-
-| Phase | Sprint Focus | Key Deliverables | Duration | Est. Hours |
-|-------|--------------|------------------|----------|------------|
-| Phase 1 | Planning & Setup | Requirements gathering, Architectural design, Database Schema formulation, CI/CD pipeline setup. | Weeks 1–2 | 80 hrs |
-| Phase 2 | Core Infrastructure | User Authentication (JWT), Express.js REST API boilerplate, React Router implementation. | Weeks 3–4 | 90 hrs |
-| Phase 3 | AI & Astrology Engine | Python microservice integration, Gemini AI prompt engineering, Kundali chart rendering UI. | Weeks 5–6 | 110 hrs |
-| Phase 4 | The Marketplace | Astrologer public profiles, search and filtering logic, Booking calendar component. | Weeks 7–8 | 100 hrs |
-| Phase 5 | Payments & Comm. | Razorpay API integration, Socket.io real-time chat architecture, message persistence. | Weeks 9–10 | 120 hrs |
-| Phase 6 | Finalization & Deployment| Dashboard analytics, comprehensive bug fixing, User Acceptance Testing (UAT), Cloud deployment. | Weeks 11–12| 80 hrs |
-| **Total** | | | **12 Weeks** | **580 Hrs** |
-
-### 7.1 Gantt Chart Representation
-
-```mermaid
-gantt
-    title Capstone Project Development Timeline
-    dateFormat YYYY-MM-DD
-    section Phase 1
-    Planning & Architecture        :done, p1, 2026-05-01, 14d
-    section Phase 2
-    Core API & Authentication      :done, p2, 2026-05-15, 14d
-    section Phase 3
-    Astrology Engine & AI          :done, p3, 2026-05-29, 14d
-    section Phase 4
-    Directory & Booking System     :done, p4, 2026-06-12, 14d
-    section Phase 5
-    Razorpay & WebSocket Chat      :done, p5, 2026-06-26, 14d
-    section Phase 6
-    Testing & Cloud Deployment     :done, p6, 2026-07-10, 14d
+### 6.5.3 Payment Verification Fallback
+```text
+FUNCTION verifySignature(order_id, payment_id, signature):
+    expected = HMAC_SHA256(order_id + "|" + payment_id, SECRET)
+    IF expected == signature:
+        updateBookingStatus("PAID")
+        emitSocketEvent("PAYMENT_SUCCESS")
+    ELSE:
+        THROW "Invalid Signature"
 ```
 
 ---
 
-# 8. Software Testing
+# 7. TESTING
 
-The software testing phase ensures that all core functionalities of the Vedic AI Astrology Platform operate reliably under expected conditions. Test cases focus on verifying the integration between the user interface, backend APIs, and external microservices.
+## 7.1 Functional Testing
+Functional testing was prioritized to validate the core user flows, including registration, role assignment, and payment order creation. Ensure that outputs match functional specifications.
 
-## 8.1 Functional Testing
+## 7.2 Structural Testing
+Structural (White Box) testing was conducted on backend API controllers to ensure all logical branches (e.g., successful payment vs. failed signature logic) execute correctly and no dead code remains.
+
+## 7.3 Levels of Testing
+
+### 7.3.1 Unit Testing
+Individual modules, such as the password hashing utility and the JWT generator, were tested in isolation.
+
+### 7.3.2 Integration Testing
+Ensured the Express.js backend successfully communicates with the Python Flask microservice without data loss.
+
+### 7.3.3 System Testing
+End-to-End flows, from user login to final WebSocket chat message delivery, were verified in a staging environment.
+
+### 7.3.4 User Acceptance Testing
+Simulated beta users navigated the platform to confirm the UI was intuitive and that AI horoscopes met readability standards.
+
+## 7.4 Testing the Project
+Below are the detailed test cases executed during the project lifecycle.
+
+### 7.4.1 Functional Testing Details
 
 Functional testing ensures that the system behaves as specified in the functional requirements.
 
-### 8.1.1 Authentication & Role Management
+#### 7.4.1.1 Authentication & Role Management
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
@@ -575,7 +547,7 @@ Functional testing ensures that the system behaves as specified in the functiona
 | TC-F-02 | Role Assignment | Register as 'Astrologer' and verify database role constraint. | The `role` field in MongoDB is explicitly set to 'astrologer'. | Pass |
 | TC-F-03 | JWT Authorization | Access protected `/api/users/profile` without a Bearer token. | System returns `401 Unauthorized`. | Pass |
 
-### 8.1.2 Astrology Engine & AI Integration
+#### 7.4.1.2 Astrology Engine & AI Integration
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
@@ -583,7 +555,7 @@ Functional testing ensures that the system behaves as specified in the functiona
 | TC-F-05 | Gemini Prompting | Request daily horoscope generation for a specific Zodiac sign. | Gemini returns structured JSON matching the few-shot template. | Pass |
 | TC-F-06 | Geocoding Fallback | Submit an invalid or unrecognized city name for birth chart. | System catches error and defaults to standard coordinates. | Pass |
 
-### 8.1.3 Booking, Payments & Chat
+#### 7.4.1.3 Booking, Payments & Chat
 
 | Test Case ID | Feature | Description | Expected Result | Status |
 |---|---|---|---|---|
@@ -591,11 +563,11 @@ Functional testing ensures that the system behaves as specified in the functiona
 | TC-F-08 | Signature Verification | Submit mocked valid Razorpay payment signature to verification endpoint. | Backend computes HMAC SHA-256, verifies match, and updates status to 'paid'. | Pass |
 | TC-F-09 | Room Isolation | Two different clients join separate chat rooms (`bookingId`). | Messages sent in Room A are not broadcasted to Room B. | Pass |
 
-## 8.2 Non-Functional Testing
+### 7.4.2 Non-Functional Testing
 
 Non-functional testing evaluates the system's readiness in terms of performance, security, usability, and reliability.
 
-### 8.2.1 Performance & Reliability
+#### 7.4.2.1 Performance & Reliability
 
 | Test Case ID | Category | Description | Expected Result | Status |
 |---|---|---|---|---|
@@ -603,24 +575,24 @@ Non-functional testing evaluates the system's readiness in terms of performance,
 | TC-NF-02 | Performance | Measure WebSocket message delivery latency between clients. | Message appears on recipient's screen in under 200ms. | Pass |
 | TC-NF-03 | Reliability | Simulate a timeout/failure from the Google Gemini API. | System gracefully catches the error and returns a predefined deterministic fallback horoscope. | Pass |
 
-### 8.2.2 Security & Usability
+#### 7.4.2.2 Security & Usability
 
 | Test Case ID | Category | Description | Expected Result | Status |
 |---|---|---|---|---|
 | TC-NF-04 | Security | Attempt SQL/NoSQL injection in the login endpoint payload. | Mongoose sanitizes inputs; login fails without compromising database. | Pass |
 | TC-NF-05 | Security | Intercept network traffic during payment checkout. | Credit card details are exclusively handled by Razorpay's iframe; no sensitive data touches the backend. | Pass |
 | TC-NF-06 | Usability | Render the Astrologer Dashboard on a 375px mobile viewport. | All charts, tables, and navigation elements scale appropriately without horizontal scrolling. | Pass |
-## 8.3 Testing Methodologies & Automation
+### 7.4.3 Testing Methodologies & Automation
 
 To ensure continuous stability across development iterations, a multi-layered testing methodology was adopted:
 
-### 8.3.1 Smoke Testing
+#### 7.4.3.1 Smoke Testing
 Before any major deployment to the staging environment, a rapid suite of Smoke Tests is executed. This ensures that critical infrastructure—such as database connectivity, external API reachability (Google Gemini, Razorpay), and the Python Microservice health—is fully operational. If the smoke tests fail, the build is immediately halted.
 
-### 8.3.2 Regression Testing
+#### 7.4.3.2 Regression Testing
 As new features (such as real-time chat and payment gateways) were integrated, comprehensive Regression Testing was performed. This guaranteed that newly introduced code did not negatively impact the existing, stable core modules (such as Authentication and Kundali generation).
 
-### 8.3.3 Automated UI Testing via Selenium WebDriver
+#### 7.4.3.3 Automated UI Testing via Selenium WebDriver
 To simulate real-world user interactions across the application's critical paths, **Selenium WebDriver** was utilized for Automated UI Testing. 
 
 | Automated Test Scenario | Selenium Action Sequence | Validation Point |
@@ -629,15 +601,85 @@ To simulate real-world user interactions across the application's critical paths
 | AI Chatbot Responsiveness | Login -> Open Chat -> Input Birth Details -> Send | Validates that the UI successfully renders the streamed Gemini AI text chunks dynamically. |
 | Dashboard State | Login as Astrologer -> Toggle Availability -> Refresh Page | Asserts that the 'Online' status indicator persists across sessions. |
 
+
 ---
 
-# 9. Conclusion
+# 8. IMPLEMENTATION
 
-The Vedic AI Astrology & Real-Time Consultation Platform represents a significant technical achievement, successfully converging deeply traditional astrological practices with cutting-edge software engineering. By engineering a robust microservices architecture, the project efficiently handles computationally heavy astronomical algorithms via Python, while leveraging the speed and scalability of Node.js for real-time web communication.
+## 8.1 Implementation of the Project
+The project was implemented over a 12-week agile sprint cycle, utilizing Git for version control and modular commits.
 
-The integration of Google's Gemini Large Language Model transforms raw celestial coordinates into highly personalized, human-readable insights, proving the immense potential of generative AI in niche, domain-specific applications. Furthermore, the seamless incorporation of Razorpay for secure financial transactions and Socket.io for instantaneous bidirectional communication creates a comprehensive, end-to-end marketplace that empowers both seekers of astrological wisdom and the experts providing it. 
+## 8.2 Conversion Plan
+Since this is a greenfield project (new platform), there is no legacy data to migrate. The conversion plan simply involves deploying the production build and inviting initial astrologers to create fresh profiles.
 
-Ultimately, this capstone project demonstrates proficiency in full-stack development, complex API integration, real-time networking, and system architecture, resulting in a production-ready application poised to deliver value in the digital astrology domain.
+## 8.3 Post-Implementation and Software Maintenance
+Maintenance will involve periodic updates to the Gemini API dependencies and monitoring the MongoDB cluster for indexing optimizations as the user base grows.
+
+---
+
+# 9. PROJECT LEGACY
+
+## 9.1 Current Status of the Project
+The application is currently in a stable Release Candidate state. Core features (Authentication, AI Horoscopes, Booking, Chat) are fully operational.
+
+## 9.2 Remaining Areas of Concern
+- Integrating audio/video calling WebRTC infrastructure.
+- Handling extreme rate limits on the free-tier Gemini API during high concurrent traffic.
+
+## 9.3 Technical and Managerial Lessons Learnt
+
+### 9.3.1 Technical Lessons
+- Mastered bidirectional event-driven programming using WebSockets.
+- Learned to orchestrate communication between different backend languages (Node.js and Python) using REST.
+
+### 9.3.2 Managerial Lessons
+- Understanding the importance of strict Agile sprint deadlines.
+- Realized the necessity of thorough requirements gathering before defining database schemas.
+
+---
+
+# 10. USER MANUAL
+
+## 10.1 Getting Started
+Users must navigate to the platform URL and select either "Register as Client" or "Register as Astrologer" from the landing page.
+
+## 10.2 Farmer Portal Guide (Client Portal)
+1. **Dashboard:** View your daily AI-generated horoscope.
+2. **Birth Chart:** Enter your birth details to generate your Kundali.
+3. **Directory:** Browse astrologers, select a time slot, and click "Book". Follow the Razorpay prompt.
+4. **Chat:** Navigate to "My Bookings" and click "Enter Chat" at the scheduled time.
+
+## 10.3 Veterinarian Portal Guide (Astrologer Portal)
+1. **Profile:** Update your biography, pricing, and specializations.
+2. **Availability:** Toggle your online status to appear in the public directory.
+3. **Consultations:** Receive real-time notifications for incoming bookings. Click to join the chat session.
+
+## 10.4 Administrator Guide
+Currently, administrative oversight is handled via direct database access (MongoDB Atlas) to moderate users or manage platform parameters.
+
+---
+
+# 11. SOURCE CODE AND SYSTEM SNAPSHOTS
+
+## 11.1 Source Code Organisation
+The repository is structured into a monorepo format:
+- `/src` : Contains the React.js frontend UI components and pages.
+- `/backend` : Contains the Node.js/Express REST API and Socket.io handlers.
+- `/python_service` : Houses the Flask microservice for the Swiss Ephemeris.
+- `/docs` : Contains architectural diagrams and this Capstone Report.
+
+## 11.2 System Snapshots
+*(Screenshots of the Landing Page, AI Horoscope UI, Astrologer Directory, and Chat Room are attached in the final printed annexure).*
+
+---
+
+# 12. BIBLIOGRAPHY
+
+1. Facebook Open Source. (2026). *React: A JavaScript library for building user interfaces.* Retrieved from https://reactjs.org/
+2. Node.js Foundation. (2026). *Node.js Documentation.* Retrieved from https://nodejs.org/
+3. Google Developers. (2026). *Gemini API Documentation.* Retrieved from https://ai.google.dev/
+4. Alois Treindl, Dieter Koch. (2026). *Swiss Ephemeris.* Astrodienst AG. Retrieved from https://www.astro.com/swisseph/
+5. Razorpay. (2026). *Payment Gateway Integration Documentation.* Retrieved from https://razorpay.com/docs/
 
 ---
 *End of Capstone Project Report*
