@@ -546,7 +546,46 @@ gantt
 
 ---
 
-# 8. Conclusion
+# 8. Software Testing
+
+The software testing phase ensures that all core functionalities of the Vedic AI Astrology Platform operate reliably under expected conditions. Test cases focus on verifying the integration between the user interface, backend APIs, and external microservices.
+
+## 8.1 Authentication and Role Management Tests
+
+| Test Case ID | Feature | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-AUTH-01 | User Registration | Submit registration form with valid email and strong password. | Account is created, password is hashed via bcrypt, and user is redirected to login. | Pass |
+| TC-AUTH-02 | Role Assignment | Register as 'Astrologer' and verify database role constraint. | The `role` field in MongoDB is explicitly set to 'astrologer'. | Pass |
+| TC-AUTH-03 | JWT Authorization | Access protected `/api/users/profile` without a Bearer token. | System returns `401 Unauthorized`. | Pass |
+
+## 8.2 AI Horoscope & Kundali Engine Tests
+
+| Test Case ID | Feature | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-KUND-01 | Ephemeris Calculation | Submit valid birth date, time, and coordinates to the Python microservice. | Microservice returns accurate Navagraha planetary degrees within 2000ms. | Pass |
+| TC-KUND-02 | Geocoding Fallback | Submit an invalid or unrecognized city name for birth chart. | System catches error and defaults to standard coordinates, logging a warning. | Pass |
+| TC-AI-01 | Gemini Prompting | Request daily horoscope generation for a specific Zodiac sign. | Gemini returns structured JSON matching the few-shot template. | Pass |
+| TC-AI-02 | AI API Timeout | Simulate a timeout from the Google Gemini API. | System gracefully catches the error and returns a predefined deterministic fallback horoscope. | Pass |
+
+## 8.3 Booking and Payment System Tests
+
+| Test Case ID | Feature | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-BOOK-01 | Slot Selection | Client attempts to book an already occupied astrologer time slot. | Frontend displays error message; backend rejects request with `409 Conflict`. | Pass |
+| TC-PAY-01 | Order Creation | Client proceeds to checkout for a standard consultation. | Backend generates a unique Razorpay `order_id` matching the consultation price. | Pass |
+| TC-PAY-02 | Signature Verification | Submit mocked valid Razorpay payment signature to verification endpoint. | Backend computes HMAC SHA-256, verifies match, and updates booking status to 'paid'. | Pass |
+
+## 8.4 Real-Time Chat (WebSocket) Tests
+
+| Test Case ID | Feature | Description | Expected Result | Status |
+|---|---|---|---|---|
+| TC-CHAT-01 | Room Isolation | Two different clients join separate chat rooms (`bookingId`). | Messages sent in Room A are not broadcasted to Room B. | Pass |
+| TC-CHAT-02 | Message Persistence | Client sends a message; connection is artificially dropped and reconnected. | Reconnecting client successfully fetches chat history from MongoDB via REST API. | Pass |
+| TC-CHAT-03 | Live Notifications | Client completes a payment for a consultation. | Astrologer receives a real-time `new_notification` event on their dashboard. | Pass |
+
+---
+
+# 9. Conclusion
 
 The Vedic AI Astrology & Real-Time Consultation Platform represents a significant technical achievement, successfully converging deeply traditional astrological practices with cutting-edge software engineering. By engineering a robust microservices architecture, the project efficiently handles computationally heavy astronomical algorithms via Python, while leveraging the speed and scalability of Node.js for real-time web communication.
 
