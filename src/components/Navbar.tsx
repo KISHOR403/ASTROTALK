@@ -185,12 +185,6 @@ const Navbar = () => {
                 </div>
               ) : (
                 <>
-                  <Link
-                    to="/login"
-                    className="font-body text-sm text-foreground/70 hover:text-foreground transition-colors"
-                  >
-                    Sign In
-                  </Link>
                   <Link to="/signup" className="btn-cosmic text-sm py-2 px-6">
                     Get Started
                   </Link>
@@ -267,9 +261,6 @@ const Navbar = () => {
                     </>
                   ) : (
                     <>
-                      <Link to="/login" className="btn-outline-cosmic text-center py-3">
-                        Sign In
-                      </Link>
                       <Link to="/signup" className="btn-cosmic text-center py-3">
                         Get Started
                       </Link>

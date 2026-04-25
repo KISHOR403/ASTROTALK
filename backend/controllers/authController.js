@@ -63,4 +63,49 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser };
+const googleLogin = async (req, res) => {
+    const { access_token, role } = req.body;
+
+    try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+
+        if (!response.ok) {
+            return res.status(401).json({ message: 'Invalid Google token' });
+        }
+
+        const data = await response.json();
+        const { email, name, sub } = data;
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            // Update googleId if it was not set previously
+            if (!user.googleId) {
+                user.googleId = sub;
+                await user.save();
+            }
+        } else {
+            // Create new user
+            user = await User.create({
+                name,
+                email,
+                googleId: sub,
+                role: role || 'client'
+            });
+        }
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id),
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { registerUser, loginUser, googleLogin };

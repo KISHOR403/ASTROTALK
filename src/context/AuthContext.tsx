@@ -14,6 +14,7 @@ interface AuthContextType {
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     register: (name: string, email: string, password: string, role: string) => Promise<void>;
+    googleLogin: (access_token: string, role?: string) => Promise<void>;
     updateUser: (data: Partial<User>) => void;
     logout: () => void;
 }
@@ -65,6 +66,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const googleLogin = async (access_token: string, role: string = 'client') => {
+        const response = await fetch('http://localhost:5000/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_token, role }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            setUser(data);
+            navigate('/dashboard');
+        } else {
+            throw new Error(data.message || 'Google Login failed');
+        }
+    };
+
     const updateUser = (data: Partial<User>) => {
         if (user) {
             const updatedUser = { ...user, ...data } as User;
@@ -80,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, updateUser, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, googleLogin, updateUser, logout }}>
             {children}
         </AuthContext.Provider>
     );
