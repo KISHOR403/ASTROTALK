@@ -1,0 +1,12 @@
+{
+  "experimentalServices": {
+    "backend": {
+      "root": "backend"
+    },
+    "frontend": {
+      "root": "./",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist"
+    }
+  }
+}
