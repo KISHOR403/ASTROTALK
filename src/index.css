@@ -296,4 +296,21 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Twelve Rashi grid: 6 (desktop) / 4 (tablet<=768) / 3 (mobile<=480) */
+  .rashi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    .rashi-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .rashi-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
 }
