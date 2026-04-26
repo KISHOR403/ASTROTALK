@@ -1,5 +1,19 @@
 {
   "version": 2,
+  "experimentalServices": {
+    "backend": {
+      "root": "backend",
+      "framework": "express",
+      "entrypoint": "server.js",
+      "installCommand": "npm install"
+    },
+    "frontend": {
+      "root": "./",
+      "framework": "vite",
+      "installCommand": "npm install",
+      "buildCommand": "npm run build"
+    }
+  },
   "builds": [
     {
       "src": "package.json",
