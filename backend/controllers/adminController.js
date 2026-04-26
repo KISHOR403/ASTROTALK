@@ -59,6 +59,12 @@ const rejectAstrologer = async (req, res) => {
 
         // Send rejection email
         await sendRejectionEmail(user.email, user.name);
+        res.json({ message: 'Astrologer rejected' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats

@@ -192,8 +192,11 @@ const updateAstrologerProfile = async (req, res) => {
 
 const getChatRequests = async (req, res) => {
     try {
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
         const requests = await Booking.find({ 
-            astrologer: req.user._id, // Assuming bookings ref the User ID of the astrologer
+            astrologer: profile._id, 
             status: 'pending' 
         }).populate('user', 'name');
         res.json(requests);
@@ -201,6 +204,7 @@ const getChatRequests = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const acceptChatRequest = async (req, res) => {
     try {
