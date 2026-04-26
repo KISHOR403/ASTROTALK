@@ -2,12 +2,14 @@
   "experimentalServices": {
     "backend": {
       "root": "backend",
-      "installCommand": "npm install"
+      "installCommand": "npm install",
+      "routePrefix": "/api"
     },
     "frontend": {
       "root": "./",
       "installCommand": "npm install",
-      "buildCommand": "npm run build"
+      "buildCommand": "npm run build",
+      "routePrefix": "/"
     }
   }
 }
