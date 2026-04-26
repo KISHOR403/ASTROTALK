@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const AstrologerProfile = require('../models/AstrologerProfile');
 const jwt = require('jsonwebtoken');
-const { sendReviewEmail } = require('../utils/sendEmail');
+const { sendReviewEmail, sendAdminNotification } = require('../utils/sendEmail');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -36,8 +36,9 @@ const registerUser = async (req, res) => {
                     userId: user._id,
                     status: 'pending'
                 });
-                // Send review email
+                // Send review email and notify admin
                 await sendReviewEmail(user.email, user.name);
+                await sendAdminNotification(user.name, user.email);
             }
 
             res.status(201).json({
@@ -64,14 +65,10 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
-            if (user.role === 'astrologer') {
-                if (user.status === 'pending') {
-                    return res.status(403).json({ message: 'Your account is under review by admin' });
-                }
-                if (user.status === 'rejected') {
-                    return res.status(403).json({ message: 'Your application was not approved. Contact support.' });
-                }
+            if (user.role === 'astrologer' && user.status === 'rejected') {
+                return res.status(403).json({ message: 'Your application was not approved. Contact support.' });
             }
+
 
             res.json({
                 _id: user._id,

@@ -190,6 +190,48 @@ const updateAstrologerProfile = async (req, res) => {
     }
 };
 
+const getChatRequests = async (req, res) => {
+    try {
+        const requests = await Booking.find({ 
+            astrologer: req.user._id, // Assuming bookings ref the User ID of the astrologer
+            status: 'pending' 
+        }).populate('user', 'name');
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const acceptChatRequest = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Request not found' });
+        
+        booking.status = 'accepted';
+        await booking.save();
+        
+        // Notify user via socket or push notification could go here
+        
+        res.json(booking);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const rejectChatRequest = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Request not found' });
+        
+        booking.status = 'rejected';
+        await booking.save();
+        
+        res.json({ message: 'Request rejected' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     completeOnboarding,
     getMyProfile,
@@ -202,7 +244,11 @@ module.exports = {
     updateAvailability,
     updateAvailabilitySlots,
     getAstrologerEarnings,
-    updateAstrologerProfile
+    updateAstrologerProfile,
+    getChatRequests,
+    acceptChatRequest,
+    rejectChatRequest
 };
+
 
 

@@ -52,8 +52,24 @@ const sendReviewEmail = async (email, name) => {
     }
 };
 
+const sendAdminNotification = async (astrologerName, astrologerEmail) => {
+    try {
+        await transporter.sendMail({
+            from: '"AstroTalk" <noreply@astrotalk.com>',
+            to: process.env.ADMIN_EMAIL || 'admin@astrotalk.com',
+            subject: 'New Astrologer Application',
+            text: `Hello Admin, A new astrologer application from ${astrologerName} (${astrologerEmail}) is pending review.`,
+            html: `<b>Hello Admin,</b><br><br>A new astrologer application from ${astrologerName} (${astrologerEmail}) is pending review.`,
+        });
+    } catch (error) {
+        console.error('Admin notification failed:', error);
+    }
+};
+
 module.exports = {
     sendApprovalEmail,
     sendRejectionEmail,
     sendReviewEmail,
+    sendAdminNotification
 };
+

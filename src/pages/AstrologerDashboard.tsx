@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import socket from '@/lib/socket';
 import { 
     User, 
     Power, 
@@ -22,25 +23,46 @@ const AstrologerDashboard = () => {
     const { toast } = useToast();
     const navigate = useNavigate();
     const [profile, setProfile] = useState<any>(null);
-
     const [stats, setStats] = useState<any>(null);
+    const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            socket.emit('join_room', user._id);
+            socket.on('new_notification', (data) => {
+                if (data.type === 'new_booking') {
+                    // Show toast and add to list
+                    toast({ title: "New Chat Request!", description: data.message });
+                    setRequests(prev => [data.booking, ...prev]);
+                }
+            });
+            return () => {
+                socket.off('new_notification');
+            };
+        }
+    }, [user]);
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [profileRes, statsRes] = await Promise.all([
+                const [profileRes, statsRes, requestsRes] = await Promise.all([
                     fetch('http://localhost:5000/api/astrologer/profile', {
                         headers: { 'Authorization': `Bearer ${user.token}` }
                     }),
                     fetch('http://localhost:5000/api/astrologer/dashboard', {
                         headers: { 'Authorization': `Bearer ${user.token}` }
+                    }),
+                    fetch('http://localhost:5000/api/astrologer/requests', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
                     })
                 ]);
 
-                if (profileRes.ok && statsRes.ok) {
+                if (profileRes.ok && statsRes.ok && requestsRes.ok) {
                     setProfile(await profileRes.json());
                     setStats(await statsRes.json());
+                    setRequests(await requestsRes.json());
                 } else {
                     const errorData = await profileRes.json();
                     if (errorData.message === 'Profile not found') {
@@ -76,6 +98,21 @@ const AstrologerDashboard = () => {
             }
         } catch (error) {
             toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+        }
+    };
+
+    const handleRequest = async (id: string, action: 'accept' | 'reject') => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/astrologer/requests/${id}/${action}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            if (res.ok) {
+                toast({ title: `Request ${action}ed` });
+                setRequests(prev => prev.filter(r => r._id !== id));
+            }
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to process request", variant: "destructive" });
         }
     };
 
@@ -131,7 +168,46 @@ const AstrologerDashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Recent Consultations */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Incoming Requests */}
+                        {requests.length > 0 && (
+                            <div className="space-y-4 mb-8">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <MessageSquare className="text-primary" />
+                                    Incoming Chat Requests
+                                </h2>
+                                <div className="grid gap-4">
+                                    {requests.map(req => (
+                                        <div key={req._id} className="bg-primary/10 border border-primary/20 p-6 rounded-3xl flex items-center justify-between animate-pulse">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                                                    <User className="text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white">{req.user?.name || "Client"}</h4>
+                                                    <p className="text-sm text-white/50">Wants to chat about {req.topic}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <button 
+                                                    onClick={() => handleRequest(req._id, 'reject')}
+                                                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/50 hover:text-red-500 transition-all text-sm font-medium"
+                                                >
+                                                    Decline
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleRequest(req._id, 'accept')}
+                                                    className="px-6 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-all text-sm font-bold shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                                                >
+                                                    Accept
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <Calendar className="text-primary" />

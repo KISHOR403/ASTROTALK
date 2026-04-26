@@ -46,7 +46,9 @@ const createBooking = async (req, res) => {
                 type: 'new_booking',
                 message: `New booking from ${populatedBooking.user.name}: ${topic || 'General Consultation'}`,
                 bookingId: booking._id,
+                booking: populatedBooking,
                 timestamp: new Date()
+
             });
         }
 
