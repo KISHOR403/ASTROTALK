@@ -3,7 +3,9 @@
     "backend": {
       "root": "backend",
       "installCommand": "npm install",
-      "routePrefix": "/api"
+      "routePrefix": "/api",
+      "framework": "express",
+      "entrypoint": "server.js"
     },
     "frontend": {
       "root": "./",
