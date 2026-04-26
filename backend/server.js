@@ -382,7 +382,8 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const astroRoutes = require('./routes/astroRoutes');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
-const horoscopeRoutes = require('./routes/horoscopeRoutes');
+const horoscopeRoutes = require('./routes/horoscope');
+const horoscopeSignRoutes = require('./routes/horoscopeRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/astrologers', astrologerRoutes);
@@ -391,6 +392,8 @@ app.use('/api/astro', astroRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/horoscope', horoscopeRoutes);
+// Backward compatible (legacy per-sign endpoint)
+app.use('/api/horoscope-sign', horoscopeSignRoutes);
 
 const PORT = process.env.PORT || 5000;
 

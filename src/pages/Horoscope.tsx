@@ -1,20 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { zodiacSigns } from '@/lib/astrology-data';
-import { Calendar, MessageCircle, Heart, Briefcase, Activity, Loader2 } from 'lucide-react';
+import { Calendar, MessageCircle, Heart, Briefcase, Activity } from 'lucide-react';
 import Logo from '@/components/Logo';
-
-interface HoroscopeAPIResponse {
-  sign: string;
-  period: string;
-  date: string;
-  planet: string;
-  element: string;
-  insight: string;
-  meters: { love: number; career: number; health: number };
-  lucky: { color: string; number: number; stone: string };
-}
+import { useHoroscope } from '@/hooks/useHoroscope';
+import type { HoroscopePeriod } from '@/types/horoscope';
 
 const getElementStyles = (element: string) => {
   switch (element.toLowerCase()) {
@@ -28,9 +19,8 @@ const getElementStyles = (element: string) => {
 
 const HoroscopePage = () => {
   const [selectedSign, setSelectedSign] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [horoscopeData, setHoroscopeData] = useState<HoroscopeAPIResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<HoroscopePeriod>('daily');
+  const { data, loading, error } = useHoroscope(activeTab);
   const stars = useMemo(() => {
     // Keep stars stable across renders (avoid "jumping" positions).
     const rand = (seed: number) => {
@@ -48,33 +38,38 @@ const HoroscopePage = () => {
     });
   }, []);
 
-  const fetchHoroscope = async (sign: string, period: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:5000/api/horoscope/${sign}/${period}`);
-      if (response.ok) {
-        const data = await response.json();
-        setHoroscopeData(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch horoscope:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedSign) {
-      fetchHoroscope(selectedSign, activeTab);
-    }
-  }, [selectedSign, activeTab]);
-
   const handleSignClick = (sign: string) => {
     setSelectedSign(sign.toLowerCase());
     // Smooth scroll to insight panel if it's already open or when it opens
     setTimeout(() => {
       document.getElementById('insight-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 300);
+  };
+
+  const selectedEntry = selectedSign ? data?.signs?.[selectedSign] : null;
+  const selectedSymbol =
+    selectedEntry?.sign
+      ? zodiacSigns.find(s => s.name.toLowerCase() === selectedEntry.sign.toLowerCase())?.symbol
+      : selectedSign
+        ? zodiacSigns.find(s => s.name.toLowerCase() === selectedSign)?.symbol
+        : undefined;
+
+  const renderStars = (rating: number) => {
+    const r = Math.max(1, Math.min(5, rating));
+    return (
+      <div className="flex items-center gap-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span
+            key={i}
+            className={i < r ? 'text-[#C9A84C]' : 'text-white/15'}
+            aria-hidden="true"
+          >
+            ★
+          </span>
+        ))}
+        <span className="sr-only">{r} out of 5</span>
+      </div>
+    );
   };
 
   return (
@@ -157,12 +152,42 @@ const HoroscopePage = () => {
             {/* Insight Panel */}
             <AnimatePresence mode="wait">
               {loading ? (
-                <div className="flex justify-center py-20">
-                  <Loader2 className="w-12 h-12 text-[#C9A84C] animate-spin" />
+                <div className="max-w-4xl mx-auto py-10 animate-float-slow" id="insight-panel">
+                  <div className="glass-card p-10 border-[#C9A84C]/30 bg-black/40 backdrop-blur-3xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A84C]/10 blur-3xl rounded-full" />
+                    <div className="grid md:grid-cols-12 gap-12 items-center">
+                      <div className="md:col-span-5 border-b md:border-b-0 md:border-r border-white/10 pb-8 md:pb-0 md:pr-8">
+                        <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 mx-auto md:mx-0 mb-6 animate-pulse" />
+                        <div className="h-9 w-48 bg-white/5 rounded-md mb-3 animate-pulse" />
+                        <div className="h-4 w-32 bg-white/5 rounded-md mb-6 animate-pulse" />
+                        <div className="space-y-3">
+                          <div className="h-4 w-56 bg-white/5 rounded-md animate-pulse" />
+                          <div className="h-4 w-44 bg-white/5 rounded-md animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="md:col-span-7 space-y-6">
+                        <div className="h-6 w-full bg-white/5 rounded-md animate-pulse" />
+                        <div className="h-6 w-5/6 bg-white/5 rounded-md animate-pulse" />
+                        <div className="grid grid-cols-1 gap-4 pt-2">
+                          <div className="h-16 w-full bg-white/5 rounded-xl animate-pulse" />
+                          <div className="h-16 w-full bg-white/5 rounded-xl animate-pulse" />
+                          <div className="h-16 w-full bg-white/5 rounded-xl animate-pulse" />
+                        </div>
+                        <div className="h-12 w-full bg-white/5 rounded-full animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ) : selectedSign && horoscopeData ? (
+              ) : error ? (
+                <div className="max-w-3xl mx-auto text-center py-14">
+                  <div className="glass-card p-10 border-[#C9A84C]/20 bg-black/35 backdrop-blur-3xl">
+                    <p className="text-white font-display text-2xl font-bold mb-2">Couldn’t load horoscope</p>
+                    <p className="text-gray-400 text-sm">{error}</p>
+                  </div>
+                </div>
+              ) : selectedSign && selectedEntry ? (
                 <motion.div
-                  key={selectedSign + activeTab}
+                  key={selectedSign + activeTab + (data?.date || '')}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
@@ -176,20 +201,30 @@ const HoroscopePage = () => {
                     <div className="grid md:grid-cols-12 gap-12 items-center">
                       {/* Left Side: Sign Profile */}
                       <div className="md:col-span-5 text-center md:text-left border-b md:border-b-0 md:border-r border-white/10 pb-8 md:pb-0 md:pr-8">
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-6 border-2 shadow-[0_0_30px_rgba(201,168,76,0.2)] ${getElementStyles(horoscopeData.element)}`}>
-                          <span className="text-6xl">{zodiacSigns.find(s => s.name === horoscopeData.sign)?.symbol}</span>
+                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-6 border-2 shadow-[0_0_30px_rgba(201,168,76,0.2)] ${getElementStyles(selectedEntry.element)}`}>
+                          <span className="text-6xl">{selectedSymbol}</span>
                         </div>
-                        <h2 className="font-display text-4xl font-bold text-white mb-2 tracking-tight">{horoscopeData.sign}</h2>
-                        <p className="text-[#C9A84C] font-semibold tracking-widest text-sm uppercase mb-6">{horoscopeData.date}</p>
+                        <h2 className="font-display text-4xl font-bold text-white mb-2 tracking-tight">{selectedEntry.sign}</h2>
+                        <p className="text-[#C9A84C] font-semibold tracking-widest text-sm uppercase mb-6">{selectedEntry.dates || data?.date}</p>
                         
                         <div className="flex flex-col gap-3 text-sm text-gray-400">
                           <div className="flex items-center gap-2 justify-center md:justify-start">
                             <Logo className="w-5 h-5 animate-pulse-glow" />
-                            <span>Planet: <span className="text-white">{horoscopeData.planet}</span></span>
+                            <span>Tip: <span className="text-white">{selectedEntry.tip}</span></span>
                           </div>
                           <div className="flex items-center gap-2 justify-center md:justify-start">
                             <Activity className="w-4 h-4 text-[#C9A84C]" />
-                            <span>Element: <span className="text-white">{horoscopeData.element}</span></span>
+                            <span>Element: <span className="text-white">{selectedEntry.element}</span></span>
+                          </div>
+                          <div className="flex items-center gap-2 justify-center md:justify-start">
+                            <Calendar className="w-4 h-4 text-[#C9A84C]" />
+                            <span>
+                              Lucky Day: <span className="text-white">{selectedEntry.lucky_day}</span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 justify-center md:justify-start">
+                            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Rating</span>
+                            {renderStars(selectedEntry.rating)}
                           </div>
                         </div>
                       </div>
@@ -197,46 +232,46 @@ const HoroscopePage = () => {
                       {/* Right Side: Predictions */}
                       <div className="md:col-span-7 space-y-8">
                         <p className="text-xl text-gray-300 leading-relaxed font-light italic">
-                          "{horoscopeData.insight}"
+                          "{selectedEntry.overall}"
                         </p>
 
-                        {/* Animated Meter Bars */}
                         <div className="grid grid-cols-1 gap-4">
-                          {[
-                            { label: 'Love', value: horoscopeData.meters.love, color: 'bg-pink-500', icon: Heart },
-                            { label: 'Career', value: horoscopeData.meters.career, color: 'bg-[#C9A84C]', icon: Briefcase },
-                            { label: 'Health', value: horoscopeData.meters.health, color: 'bg-teal-400', icon: Activity },
-                          ].map((meter) => (
-                            <div key={meter.label} className="space-y-1.5">
-                              <div className="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-gray-500">
-                                <span className="flex items-center gap-1"><meter.icon className="w-3 h-3"/> {meter.label}</span>
-                                <span>{meter.value}%</span>
-                              </div>
-                              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${meter.value}%` }}
-                                  transition={{ duration: 1.5, ease: "easeOut" }}
-                                  className={`h-full ${meter.color}`}
-                                />
-                              </div>
+                          <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-2">
+                              <Heart className="w-3.5 h-3.5 text-pink-500" />
+                              Love
                             </div>
-                          ))}
+                            <p className="text-gray-300 text-sm leading-relaxed">{selectedEntry.love}</p>
+                          </div>
+                          <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-2">
+                              <Briefcase className="w-3.5 h-3.5 text-[#C9A84C]" />
+                              Career
+                            </div>
+                            <p className="text-gray-300 text-sm leading-relaxed">{selectedEntry.career}</p>
+                          </div>
+                          <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-2">
+                              <Activity className="w-3.5 h-3.5 text-teal-400" />
+                              Health
+                            </div>
+                            <p className="text-gray-300 text-sm leading-relaxed">{selectedEntry.health}</p>
+                          </div>
                         </div>
 
                         {/* Lucky Section */}
                         <div className="flex flex-wrap gap-4 pt-4">
                           <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2 animate-float">
                             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Color</span>
-                            <span className="text-sm text-white font-medium">{horoscopeData.lucky.color}</span>
+                            <span className="text-sm text-white font-medium">{selectedEntry.lucky_color}</span>
                           </div>
                           <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2 animate-float" style={{ animationDelay: '0.5s' }}>
                             <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Number</span>
-                            <span className="text-sm text-white font-medium">{horoscopeData.lucky.number}</span>
+                            <span className="text-sm text-white font-medium">{selectedEntry.lucky_number}</span>
                           </div>
                           <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2 animate-float" style={{ animationDelay: '1s' }}>
-                            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Stone</span>
-                            <span className="text-sm text-white font-medium">{horoscopeData.lucky.stone}</span>
+                            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Day</span>
+                            <span className="text-sm text-white font-medium">{selectedEntry.lucky_day}</span>
                           </div>
                         </div>
 
