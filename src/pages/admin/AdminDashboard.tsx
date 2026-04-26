@@ -12,6 +12,7 @@ import {
     Clock,
     ChevronRight
 } from 'lucide-react';
+import socket from '@/lib/socket';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -19,24 +20,62 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [activities, setActivities] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/admin/stats', {
-                    headers: { 'Authorization': `Bearer ${user.token}` }
-                });
-                if (res.ok) {
-                    setStats(await res.json());
-                }
+                const [statsRes, activitiesRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/admin/stats', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    }),
+                    fetch('http://localhost:5000/api/admin/activities', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    })
+                ]);
+
+                if (statsRes.ok) setStats(await statsRes.json());
+                if (activitiesRes.ok) setActivities(await activitiesRes.json());
+                
             } catch (error) {
-                console.error("Failed to fetch stats");
+                console.error("Failed to fetch dashboard data");
             } finally {
                 setLoading(false);
             }
         };
-        fetchStats();
+        fetchDashboardData();
+
+        // Real-time activity updates
+        socket.on('new_astrologer_application', (data) => {
+            const newActivity = {
+                _id: Date.now().toString(),
+                title: "New astrologer applied",
+                user: data.name,
+                createdAt: new Date(),
+                color: "text-primary"
+            };
+            setActivities(prev => [newActivity, ...prev.slice(0, 4)]);
+            
+            // Update stats too
+            setStats((prev: any) => prev ? { 
+                ...prev, 
+                pendingApprovals: prev.pendingApprovals + 1 
+            } : null);
+        });
+
+        return () => {
+            socket.off('new_astrologer_application');
+        };
     }, []);
+
+    const formatActivityTime = (date: any) => {
+        const now = new Date();
+        const diff = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return new Date(date).toLocaleDateString();
+    };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading Admin Panel...</div>;
 
@@ -89,10 +128,20 @@ const AdminDashboard = () => {
                         <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8">
                             <h3 className="text-xl font-bold text-white mb-6">Recent Activity</h3>
                             <div className="space-y-6">
-                                <ActivityItem title="New astrologer applied" user="Rahul Sharma" time="2 hours ago" />
-                                <ActivityItem title="New astrologer applied" user="Priya Nair" time="5 hours ago" />
-                                <ActivityItem title="User complaint filed" user="Client #4023" time="1 day ago" color="text-red-500" />
-                                <ActivityItem title="System update completed" user="V2.4.1" time="2 days ago" color="text-green-500" />
+                                {activities.map((activity) => (
+                                    <ActivityItem 
+                                        key={activity._id}
+                                        title={activity.title} 
+                                        user={activity.user} 
+                                        time={formatActivityTime(activity.createdAt)} 
+                                        color={activity.color} 
+                                        onClick={() => {
+                                            if (activity.type === 'astrologer_application') {
+                                                navigate('/admin/astrologers/pending');
+                                            }
+                                        }}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -101,9 +150,16 @@ const AdminDashboard = () => {
                     <div className="space-y-6">
                         <h2 className="text-xl font-bold">Manage Platform</h2>
                         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-4">
-                            <AdminLink label="Astrologers List" count={stats.astrologers} />
+                            <AdminLink 
+                                label="Astrologers List" 
+                                count={stats.astrologers} 
+                                onClick={() => navigate('/admin/astrologers')}
+                            />
                             <AdminLink label="User Database" count={stats.users} />
-                            <AdminLink label="Chat Logs" />
+                            <AdminLink 
+                                label="Chat Logs" 
+                                onClick={() => navigate('/admin/chats')}
+                            />
                             <AdminLink label="Financial Reports" />
                             <AdminLink label="Platform Settings" />
                         </div>
@@ -136,8 +192,11 @@ const AdminStatCard = ({ title, value, icon, trend }: any) => (
     </motion.div>
 );
 
-const ActivityItem = ({ title, user, time, color }: any) => (
-    <div className="flex items-center justify-between group cursor-pointer">
+const ActivityItem = ({ title, user, time, color, onClick }: any) => (
+    <div 
+        onClick={onClick}
+        className="flex items-center justify-between group cursor-pointer"
+    >
         <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <Clock size={16} className="text-white/30" />
@@ -151,14 +210,18 @@ const ActivityItem = ({ title, user, time, color }: any) => (
     </div>
 );
 
-const AdminLink = ({ label, count }: any) => (
-    <button className="w-full py-4 px-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all text-left flex justify-between items-center group">
+const AdminLink = ({ label, count, onClick }: any) => (
+    <button 
+        onClick={onClick}
+        className="w-full py-4 px-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all text-left flex justify-between items-center group"
+    >
         <span className="text-sm font-medium text-white/70 group-hover:text-white">{label}</span>
-        {count ? (
-            <span className="text-[10px] bg-white/10 px-2 py-1 rounded-lg text-white/50">{count}</span>
-        ) : (
-            <ChevronRight size={14} className="text-white/20" />
-        )}
+        <div className="flex items-center gap-3">
+            {count && (
+                <span className="text-[10px] bg-white/10 px-2 py-1 rounded-lg text-white/50">{count}</span>
+            )}
+            <ChevronRight size={14} className="text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
+        </div>
     </button>
 );
 

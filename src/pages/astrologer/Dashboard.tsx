@@ -226,10 +226,10 @@ const AstrologerDashboard = () => {
                     <div className="space-y-6">
                         <h2 className="text-xl font-bold">Quick Actions</h2>
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-                            <ActionBtn label="Edit Profile" />
-                            <ActionBtn label="Manage Availability" />
-                            <ActionBtn label="View Wallet" />
-                            <ActionBtn label="Contact Support" />
+                            <ActionBtn label="Edit Profile" onClick={() => navigate('/astrologer/edit-profile')} />
+                            <ActionBtn label="Manage Availability" onClick={() => navigate('/astrologer/availability')} />
+                            <ActionBtn label="View Wallet" onClick={() => navigate('/astrologer/earnings')} />
+                            <ActionBtn label="Contact Support" onClick={() => navigate('/contact')} />
                         </div>
                     </div>
                 </div>
@@ -273,10 +273,13 @@ const ConsultationRow = () => (
     </div>
 );
 
-const ActionBtn = ({ label }: any) => (
-    <button className="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all text-left text-sm font-medium flex justify-between items-center">
+const ActionBtn = ({ label, onClick }: any) => (
+    <button 
+        onClick={onClick}
+        className="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all text-left text-sm font-medium flex justify-between items-center group"
+    >
         {label}
-        <ChevronRight size={16} className="text-white/20" />
+        <ChevronRight size={16} className="text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
     </button>
 );
 

@@ -29,6 +29,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PendingAstrologers from "./pages/admin/PendingAstrologers";
+import AstrologerList from "./pages/admin/AstrologerList";
+import ChatLogs from "./pages/admin/ChatLogs";
 
 
 const queryClient = new QueryClient();
@@ -79,7 +81,9 @@ const App = () => (
         {/* Admin Routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/astrologers" element={<AstrologerList />} />
           <Route path="/admin/astrologers/pending" element={<PendingAstrologers />} />
+          <Route path="/admin/chats" element={<ChatLogs />} />
         </Route>
 
 

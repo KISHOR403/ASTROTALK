@@ -91,10 +91,91 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+const Activity = require('../models/Activity');
+
+// @desc    Get recent activities
+// @route   GET /api/admin/activities
+// @access  Private/Admin
+const getRecentActivities = async (req, res) => {
+    try {
+        const activities = await Activity.find().sort({ createdAt: -1 }).limit(5);
+        res.json(activities);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get all astrologers
+// @route   GET /api/admin/astrologers
+// @access  Private/Admin
+const getAllAstrologers = async (req, res) => {
+    try {
+        const astrologers = await AstrologerProfile.find().populate('userId', 'name email status');
+        res.json(astrologers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const Booking = require('../models/Booking');
+
+// @desc    Get astrologer logs (bookings)
+// @route   GET /api/admin/astrologers/:id/logs
+// @access  Private/Admin
+const getAstrologerLogs = async (req, res) => {
+    try {
+        const logs = await Booking.find({ astrologerId: req.params.id })
+            .populate('clientId', 'name email')
+            .sort({ createdAt: -1 });
+        res.json(logs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get all chat logs (bookings with chat history)
+// @route   GET /api/admin/chats
+// @access  Private/Admin
+const getAllChatLogs = async (req, res) => {
+    try {
+        const chats = await Booking.find()
+            .populate('clientId', 'name email')
+            .populate('astrologerId', 'userId')
+            .sort({ updatedAt: -1 });
+            
+        // We need to get the user name for the astrologer since astrologerId points to AstrologerProfile
+        // This populate might need careful handling depending on the schema
+        res.json(chats);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const Message = require('../models/Message');
+
+// @desc    Get chat messages for a specific booking (Admin view)
+// @route   GET /api/admin/chats/:bookingId
+// @access  Private/Admin
+const getChatMessageLogs = async (req, res) => {
+    try {
+        const messages = await Message.find({ bookingId: req.params.bookingId })
+            .populate('senderId', 'name email')
+            .sort({ createdAt: 1 });
+        res.json(messages);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getPendingAstrologers,
+    getAllAstrologers,
     approveAstrologer,
     rejectAstrologer,
-    getDashboardStats
+    getDashboardStats,
+    getRecentActivities,
+    getAstrologerLogs,
+    getAllChatLogs,
+    getChatMessageLogs
 };
 

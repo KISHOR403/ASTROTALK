@@ -17,6 +17,7 @@ import {
   ChevronDown, 
   CalendarDays,
   Sparkles,
+  Shield,
   TrendingUp,
   History,
   Info
@@ -220,6 +221,16 @@ const DashboardPage = () => {
                     </button>
                   );
                 })}
+                
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={() => navigate('/admin/dashboard')}
+                    className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-primary hover:bg-primary/10 transition-all duration-300 group"
+                  >
+                    <Shield className="w-5 h-5 transition-transform group-hover:scale-110" />
+                    <span className="font-semibold text-gradient-gold">Admin Panel</span>
+                  </button>
+                )}
                 
                 <div className="h-px bg-white/5 my-4 mx-4" />
                 

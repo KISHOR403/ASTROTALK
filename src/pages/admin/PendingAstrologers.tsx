@@ -15,6 +15,7 @@ import {
     AlertCircle,
     Loader2
 } from 'lucide-react';
+import socket from '@/lib/socket';
 import ApproveModal from '@/components/admin/ApproveModal';
 import RejectModal from '@/components/admin/RejectModal';
 
@@ -29,6 +30,19 @@ const PendingAstrologers = () => {
 
     useEffect(() => {
         fetchPending();
+
+        // Listen for new applications
+        socket.on('new_astrologer_application', (data) => {
+            toast({ 
+                title: "New Application!", 
+                description: `${data.name} just submitted their profile.` 
+            });
+            fetchPending();
+        });
+
+        return () => {
+            socket.off('new_astrologer_application');
+        };
     }, []);
 
     const fetchPending = async () => {

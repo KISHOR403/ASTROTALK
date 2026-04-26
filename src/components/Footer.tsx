@@ -47,7 +47,7 @@ const Footer = () => {
                 <Star className="w-4 h-4 text-primary absolute -top-1 -right-1" />
               </div>
               <span className="font-display text-2xl font-semibold text-gradient-gold">
-                Vedic
+                Astrotalk
               </span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm leading-relaxed">
@@ -126,7 +126,7 @@ const Footer = () => {
         <div className="section-divider my-12" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} Vedic. All rights reserved.
+            © {currentYear} Astrotalk. All rights reserved.
           </p>
           <div className="flex gap-6">
             {footerLinks.company.slice(2).map((link) => (

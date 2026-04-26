@@ -74,7 +74,7 @@ const HeroSection = () => {
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gradient-aurora">Vedic Unveiled</span>
+            <span className="text-gradient-aurora">Astrotalk Unveiled</span>
           </h1>
 
           {/* Subtitle */}

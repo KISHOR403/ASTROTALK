@@ -1,7 +1,7 @@
 {
-    "name": "vedic-backend",
+    "name": "astrotalk-backend",
     "version": "1.0.0",
-    "description": "Backend for Vedic Astrology App",
+    "description": "Backend for Astrotalk Astrology App",
     "main": "server.js",
     "scripts": {
         "start": "node server.js",

@@ -73,7 +73,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-3 group">
               <Logo className="w-9 h-9 animate-pulse-glow" />
               <span className="font-display text-xl md:text-2xl font-semibold text-gradient-gold">
-                Vedic
+                Astrotalk
               </span>
             </Link>
 
@@ -169,7 +169,7 @@ const Navbar = () => {
                     </AnimatePresence>
                   </div>
 
-                  <Link to={user.role === 'astrologer' ? '/astrologer/dashboard' : '/dashboard'} className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors px-3 py-1.5 rounded-xl hover:bg-white/5">
+                  <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'astrologer' ? '/astrologer/dashboard' : '/dashboard'} className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors px-3 py-1.5 rounded-xl hover:bg-white/5">
                     <UserIcon className="w-4 h-4 text-primary" />
                     <span className="text-sm font-medium">{user.name}</span>
                   </Link>
@@ -249,7 +249,7 @@ const Navbar = () => {
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{user.role}</p>
                         </div>
                       </div>
-                      <Link to={user.role === 'astrologer' ? '/astrologer/dashboard' : '/dashboard'} className="btn-cosmic text-center py-3">
+                      <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'astrologer' ? '/astrologer/dashboard' : '/dashboard'} className="btn-cosmic text-center py-3">
                         Dashboard
                       </Link>
                       <button onClick={logout} className="btn-outline-cosmic text-center py-3 flex items-center justify-center gap-2">

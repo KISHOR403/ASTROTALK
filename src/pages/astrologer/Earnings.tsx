@@ -31,9 +31,10 @@ const Earnings = () => {
     useEffect(() => {
         const fetchEarnings = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/astrologers/earnings', {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                const response = await fetch('http://localhost:5000/api/astrologer/earnings', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${userInfo.token}`
                     }
                 });
                 const data = await response.json();

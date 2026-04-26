@@ -1,7 +1,8 @@
-const Astrologer = require('../models/Astrologer'); // Keep for legacy if needed
 const AstrologerProfile = require('../models/AstrologerProfile');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
+const Activity = require('../models/Activity');
+const { sendAdminNotification, sendReviewEmail } = require('../utils/sendEmail');
 
 // @desc    Complete astrologer onboarding
 // @route   POST /api/astrologer/onboarding
@@ -25,6 +26,27 @@ const completeOnboarding = async (req, res) => {
         profile.status = 'pending';
 
         await profile.save();
+
+        // Log Activity
+        await Activity.create({
+            title: 'New astrologer applied',
+            user: req.user.name,
+            type: 'astrologer_application'
+        });
+
+        // Notify user
+        await sendReviewEmail(req.user.email, req.user.name);
+        // Notify admin
+        await sendAdminNotification(req.user.name, req.user.email);
+
+        // Notify admin via socket
+        if (req.io) {
+            req.io.emit('new_astrologer_application', {
+                name: req.user.name,
+                email: req.user.email
+            });
+        }
+
         res.json({ message: 'Profile submitted for review' });
     } catch (error) {
         res.status(500).json({ message: error.message });

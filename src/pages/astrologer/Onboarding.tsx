@@ -35,7 +35,7 @@ const AstrologerOnboarding = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const { user } = useAuth() as any;
+  const { user, updateUser } = useAuth() as any;
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -48,6 +48,7 @@ const AstrologerOnboarding = () => {
         if (res.ok) {
           const profile = await res.json();
           if (profile.status === 'approved') {
+            updateUser({ status: 'approved' });
             navigate('/astrologer/dashboard');
           } else if (profile.status === 'pending' && profile.specialization && profile.specialization.length > 0) {
             setIsSubmitted(true);

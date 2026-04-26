@@ -131,7 +131,7 @@ Output ONLY valid JSON, no markdown.`;
 const getCoordinates = async (location) => {
     try {
         const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`, {
-            headers: { 'User-Agent': 'VedicAstroApp/1.0 (contact@vedic.app)' }
+            headers: { 'User-Agent': 'AstrotalkAstroApp/1.0 (contact@astrotalk.com)' }
         });
         const data = await res.json();
         if (data && data.length > 0) {
