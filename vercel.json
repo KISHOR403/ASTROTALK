@@ -1,10 +1,13 @@
 {
   "experimentalServices": {
     "backend": {
-      "root": "backend"
+      "root": "backend",
+      "installCommand": "npm install"
     },
     "frontend": {
-      "root": "./"
+      "root": "./",
+      "installCommand": "npm install",
+      "buildCommand": "npm run build"
     }
   }
 }
