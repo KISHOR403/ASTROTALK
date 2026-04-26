@@ -82,85 +82,44 @@ const TestimonialsSection = () => {
           </p>
         </motion.div>
 
-        {/* Testimonials Carousel */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative max-w-4xl mx-auto"
-        >
-          {/* Main Testimonial Card */}
-          <div className="glass-card p-8 md:p-12 relative overflow-hidden">
-            {/* Quote Icon */}
-            <Quote className="absolute top-6 right-6 w-12 h-12 text-primary/20" />
+        {/* Testimonials Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {testimonials.slice(0, 3).map((testimonial, index) => (
+            <motion.div
+              key={testimonial.id}
+              initial={{ opacity: 0, y: 40 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="glass-card p-8 relative overflow-hidden flex flex-col h-full"
+            >
+              <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/10" />
 
-            <div className="flex flex-col md:flex-row gap-8 items-center">
-              {/* Avatar */}
-              <div className="shrink-0">
-                <div className="w-24 h-24 rounded-full bg-gradient-cosmic flex items-center justify-center text-4xl border-4 border-primary/30">
-                  {testimonials[currentIndex].avatar}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full bg-gradient-cosmic flex items-center justify-center text-2xl border-2 border-primary/30 shrink-0">
+                  {testimonial.avatar}
                 </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 text-center md:text-left">
-                {/* Rating */}
-                <div className="flex gap-1 justify-center md:justify-start mb-4">
-                  {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-accent text-accent" />
-                  ))}
-                </div>
-
-                {/* Text */}
-                <p className="text-lg md:text-xl text-foreground/90 leading-relaxed mb-6 italic">
-                  "{testimonials[currentIndex].text}"
-                </p>
-
-                {/* Author */}
                 <div>
                   <div className="font-display text-lg font-semibold text-foreground">
-                    {testimonials[currentIndex].name}
+                    {testimonial.name}
                   </div>
                   <div className="text-muted-foreground text-sm">
-                    {testimonials[currentIndex].role}
+                    {testimonial.role}
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <button
-              onClick={prevTestimonial}
-              className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center transition-colors"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                ))}
+              </div>
 
-            {/* Dots */}
-            <div className="flex gap-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentIndex
-                      ? 'w-8 bg-accent'
-                      : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextTestimonial}
-              className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center transition-colors"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-        </motion.div>
+              <p className="text-foreground/90 leading-relaxed italic flex-1">
+                "{testimonial.text}"
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

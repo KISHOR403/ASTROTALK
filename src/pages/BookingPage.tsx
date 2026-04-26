@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import StarfieldBackground from '@/components/StarfieldBackground';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import Logo from '@/components/Logo';
 import {
     Calendar as CalendarIcon,
     Clock,
-    Sparkles,
     CheckCircle2,
     ChevronRight,
     AlertCircle,
@@ -326,7 +326,7 @@ const BookingPage = () => {
                                     <>
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-                                                <Sparkles className="w-6 h-6 text-primary" />
+                                                <Logo className="w-8 h-8 animate-pulse-glow" />
                                             </div>
                                             <div>
                                                 <h3 className="text-xl font-display font-bold">Secure Checkout</h3>

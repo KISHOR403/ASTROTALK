@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
+import Logo from '../Logo';
 
 const CTASection = () => {
   const ref = useRef(null);
@@ -15,7 +16,7 @@ const CTASection = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-3xl"
+          className="relative overflow-hidden rounded-3xl border-2 border-accent shadow-[0_0_40px_rgba(234,179,8,0.4)] bg-background/95"
         >
           {/* Background Gradient */}
           <div className="absolute inset-0 bg-gradient-cosmic opacity-90" />
@@ -53,7 +54,7 @@ const CTASection = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-8">
-                <Sparkles className="w-4 h-4 text-accent" />
+                <Logo className="w-5 h-5 animate-pulse-glow" />
                 <span className="text-sm text-white/90">Begin Your Cosmic Journey</span>
               </div>
 

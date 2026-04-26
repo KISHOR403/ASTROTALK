@@ -64,7 +64,7 @@ export const LocationInput = ({
                             if (inputValue.length >= 2) setOpen(true);
                         }}
                         placeholder={placeholder}
-                        className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground placeholder:text-muted-foreground"
+                        className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-accent/20 focus:border-accent focus:ring-1 focus:ring-accent focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] outline-none transition-all text-foreground placeholder:text-muted-foreground"
                     />
                 </div>
             </PopoverAnchor>

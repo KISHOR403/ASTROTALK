@@ -121,9 +121,9 @@ export default {
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
         "scale-in": "scale-in 0.5s ease-out forwards",
         "slide-in-right": "slide-in-right 0.3s ease-out",
-        "float": "float 6s ease-in-out infinite",
-        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "star-twinkle": "star-twinkle 3s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
+        "float-slow": "float-slow 5s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-cosmic": "linear-gradient(135deg, hsl(270 60% 55%) 0%, hsl(220 70% 45%) 50%, hsl(240 50% 35%) 100%)",

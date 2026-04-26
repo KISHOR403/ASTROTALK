@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Check, Calendar, Clock, User, Sparkles } from 'lucide-react';
+import { Check, Calendar, Clock, User } from 'lucide-react';
+import Logo from '../Logo';
 import { Astrologer } from '@/lib/astrologer-data';
 
 interface BookingConfirmationProps {
@@ -67,7 +68,7 @@ const BookingConfirmation = ({ astrologer, selectedDate, selectedTime, onBookAno
           </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Sparkles className="w-4 h-4" /> Session
+              <Logo className="w-5 h-5 animate-pulse-glow" /> Session
             </span>
             <span className="font-medium text-sm">60 min Video Call</span>
           </div>

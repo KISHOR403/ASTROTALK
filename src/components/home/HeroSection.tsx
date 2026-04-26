@@ -6,6 +6,10 @@ import { zodiacSigns } from '@/lib/astrology-data';
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Central Glowing Orb */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full bg-primary/20 blur-[100px] pointer-events-none mix-blend-screen" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] md:w-[400px] md:h-[400px] rounded-full bg-accent/10 blur-[80px] pointer-events-none mix-blend-screen" />
+
       {/* Animated Zodiac Ring */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <motion.div
@@ -70,7 +74,7 @@ const HeroSection = () => {
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gradient-aurora">AstroTalk Unveiled</span>
+            <span className="text-gradient-aurora">Vedic Unveiled</span>
           </h1>
 
           {/* Subtitle */}

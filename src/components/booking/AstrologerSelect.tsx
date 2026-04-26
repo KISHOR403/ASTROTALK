@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Star, Clock, Globe, Sparkles } from 'lucide-react';
+import { Star, Clock, Globe } from 'lucide-react';
+import Logo from '../Logo';
 import { Astrologer } from '@/lib/astrologer-data';
 
 interface AstrologerSelectProps {
@@ -61,7 +62,7 @@ const AstrologerSelect = ({ astrologers, selectedId, onSelect }: AstrologerSelec
                     {ast.languages.slice(0, 2).join(', ')}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-accent" />
+                    <Logo className="w-4 h-4 animate-pulse-glow" />
                     ₹{ast.pricePerMinute}/min
                   </span>
                 </div>

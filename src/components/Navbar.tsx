@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sparkles, Moon, Star, LogOut, User as UserIcon, Bell, Calendar } from 'lucide-react';
+import { Menu, X, Moon, Star, LogOut, User as UserIcon, Bell, Calendar } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
 import socket from '@/lib/socket';
 import { Badge } from '@/components/ui/badge';
@@ -70,12 +71,9 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <Sparkles className="w-8 h-8 text-accent animate-pulse-glow" />
-                <Star className="w-4 h-4 text-primary absolute -top-1 -right-1 animate-star-twinkle" />
-              </div>
+              <Logo className="w-9 h-9 animate-pulse-glow" />
               <span className="font-display text-xl md:text-2xl font-semibold text-gradient-gold">
-                AstroTalk
+                Vedic
               </span>
             </Link>
 

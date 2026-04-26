@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { Sparkles, Calendar, Clock, User, ArrowRight, Download, Info, ChevronDown, ChevronUp, AlertCircle, BookOpen } from 'lucide-react';
+import { Calendar, Clock, User, ArrowRight, Download, Info, ChevronDown, ChevronUp, AlertCircle, BookOpen, MapPin, Lock } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { LocationInput } from '@/components/LocationInput';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -353,8 +354,11 @@ const BirthChartPage = () => {
 
   return (
     <Layout>
-      <section className="py-24">
-        <div className="container mx-auto px-4">
+      <section className="py-24 relative overflow-hidden">
+        {/* Decorative Zodiac Orbit */}
+        <div className="absolute top-0 right-0 -mr-[20%] -mt-[10%] w-[800px] h-[800px] rounded-full border border-accent/10 opacity-20 animate-rotate-slow pointer-events-none" style={{ backgroundImage: 'repeating-radial-gradient(circle, transparent, transparent 40px, rgba(234, 179, 8, 0.1) 40px, rgba(234, 179, 8, 0.1) 41px)' }} />
+        
+        <div className="container mx-auto px-4 relative z-10">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -362,7 +366,7 @@ const BirthChartPage = () => {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="w-4 h-4 text-accent" />
+              <Logo className="w-5 h-5 animate-pulse-glow" />
               <span className="text-sm text-foreground/80">Vedic Kundli Generator</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
@@ -397,7 +401,7 @@ const BirthChartPage = () => {
                     value={birthDetails.name}
                     onChange={(e) => setBirthDetails({ ...birthDetails, name: e.target.value })}
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-accent/20 focus:border-accent focus:ring-1 focus:ring-accent focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] outline-none transition-all text-foreground"
                   />
                 </div>
 
@@ -409,7 +413,7 @@ const BirthChartPage = () => {
                     type="date"
                     value={birthDetails.date}
                     onChange={(e) => setBirthDetails({ ...birthDetails, date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-accent/20 focus:border-accent focus:ring-1 focus:ring-accent focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] outline-none transition-all text-foreground"
                   />
                 </div>
 
@@ -421,7 +425,7 @@ const BirthChartPage = () => {
                     type="time"
                     value={birthDetails.time}
                     onChange={(e) => setBirthDetails({ ...birthDetails, time: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-accent/20 focus:border-accent focus:ring-1 focus:ring-accent focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] outline-none transition-all text-foreground"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     Accurate birth time is crucial for precise chart calculation
@@ -430,7 +434,7 @@ const BirthChartPage = () => {
 
                 <div>
                   <label className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <User className="w-4 h-4" /> Place of Birth
+                    <MapPin className="w-4 h-4 text-accent" /> Place of Birth
                   </label>
                   <LocationInput
                     value={birthDetails.place}
@@ -443,7 +447,7 @@ const BirthChartPage = () => {
               <button
                 onClick={generateChart}
                 disabled={isGenerating || !birthDetails.name || !birthDetails.date || !birthDetails.time || !birthDetails.place}
-                className="btn-cosmic w-full mt-6 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-gold w-full mt-6 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGenerating ? (
                   <>
@@ -457,6 +461,13 @@ const BirthChartPage = () => {
                   </>
                 )}
               </button>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Lock className="w-3.5 h-3.5" />
+                <span>100% Private</span>
+                <span>•</span>
+                <span>Trusted by 10M+ users</span>
+              </div>
 
               {error && (
                 <div className="mt-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
@@ -610,7 +621,7 @@ const BirthChartPage = () => {
                       </p>
 
                       <div className="mt-6 pt-4 border-t border-border/40 flex items-center gap-2 text-xs text-muted-foreground">
-                        <Sparkles className="w-3.5 h-3.5 text-accent" />
+                        <Logo className="w-4 h-4 animate-pulse-glow" />
                         <span>This interpretation was generated by AI based on your exact planetary positions using classical Vedic astrology principles.</span>
                       </div>
                     </div>
@@ -623,16 +634,25 @@ const BirthChartPage = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="max-w-md mx-auto"
+                className="max-w-2xl mx-auto mt-12 relative"
               >
-                <div className="glass-card p-12 text-center">
-                  <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6 mx-auto">
-                    <Sparkles className="w-12 h-12 text-muted-foreground/30" />
+                <div className="relative blur-[6px] opacity-40 select-none pointer-events-none">
+                  <KundliChart
+                    housePlanets={{ 1: ['Su', 'Me'], 4: ['Mo'], 7: ['Ju'], 10: ['Ma'] }}
+                    houseRashiNumbers={{ 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12 }}
+                    ascendant="Aries"
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="glass-card p-8 text-center max-w-sm border border-accent/20 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
+                    <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4 mx-auto border border-accent/30 shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+                      <Logo className="w-10 h-10 animate-pulse-glow" />
+                    </div>
+                    <h3 className="font-display text-xl font-semibold mb-2">Your Kundli Awaits</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Enter your birth details above to unlock your personalized Vedic blueprint.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-semibold mb-2">Your Kundli Awaits</h3>
-                  <p className="text-muted-foreground">
-                    Enter your birth details above to generate your personalized Vedic Kundli with detailed interpretations.
-                  </p>
                 </div>
               </motion.div>
             )

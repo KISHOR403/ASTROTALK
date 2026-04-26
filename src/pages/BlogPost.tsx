@@ -34,8 +34,11 @@ const BlogPost = () => {
 
   return (
     <Layout>
-      <article className="py-20">
-        <div className="container mx-auto px-4">
+      <article className="py-16 md:py-20 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[70rem] h-[70rem] rounded-full bg-gradient-to-b from-primary/10 via-accent/10 to-transparent blur-3xl" />
+        </div>
+        <div className="container mx-auto px-4 relative">
 
           {/* Back button */}
           <motion.div
@@ -45,7 +48,7 @@ const BlogPost = () => {
           >
             <button
               onClick={() => navigate('/blog')}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm glass-card px-4 py-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Blog
@@ -60,48 +63,63 @@ const BlogPost = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-10"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold border border-primary/20">
-                  {post.category}
-                </span>
-                {post.featured && (
-                  <span className="px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold">
-                    Featured
+              <div className="glass-card p-7 sm:p-8">
+                <div className="flex flex-wrap items-center gap-2 mb-5">
+                  <span className="px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold border border-primary/20">
+                    {post.category}
                   </span>
-                )}
-              </div>
-
-              <div className="text-7xl mb-6">{post.image}</div>
-
-              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-foreground">
-                {post.title}
-              </h1>
-
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                {post.excerpt}
-              </p>
-
-              {/* Meta */}
-              <div className="flex flex-wrap items-center gap-4 pb-8 border-b border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-sm">
-                    {post.author.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{post.author}</p>
-                    <p className="text-xs text-muted-foreground">{post.authorRole}</p>
-                  </div>
+                  {post.featured && (
+                    <span className="px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold border border-accent/20">
+                      Featured
+                    </span>
+                  )}
+                  <button
+                    className="ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/70 bg-background/30 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: post.title, url: window.location.href });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                      }
+                    }}
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    Share
+                  </button>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground ml-auto">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />{post.date}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />{post.readTime}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5" />Article
-                  </span>
+
+                <div className="text-7xl mb-6 leading-none">{post.image}</div>
+
+                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-5 text-foreground">
+                  {post.title}
+                </h1>
+
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8">
+                  {post.excerpt}
+                </p>
+
+                {/* Meta */}
+                <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-border/70">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-sm">
+                      {post.author.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{post.author}</p>
+                      <p className="text-xs text-muted-foreground">{post.authorRole}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground sm:ml-auto">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5" />{post.date}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />{post.readTime}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5" />Article
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -111,7 +129,7 @@ const BlogPost = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="prose-vedic space-y-6 mb-12"
+              className="prose-vedic space-y-6 mb-12 glass-card p-7 sm:p-9"
             >
               {post.content.map((section, idx) => {
                 if (section.type === 'paragraph') {
@@ -143,7 +161,7 @@ const BlogPost = () => {
                 }
                 if (section.type === 'highlight' || section.type === 'quote') {
                   return (
-                    <blockquote key={idx} className="glass-card border-l-4 border-accent px-6 py-5 rounded-r-xl">
+                    <blockquote key={idx} className="border-l-4 border-accent px-6 py-5 rounded-r-xl bg-background/30">
                       <p className="text-accent font-medium italic text-sm md:text-base leading-relaxed">
                         {section.text}
                       </p>
@@ -166,24 +184,11 @@ const BlogPost = () => {
                 <Link
                   key={tag}
                   to={`/blog?search=${encodeURIComponent(tag)}`}
-                  className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs hover:bg-primary/20 hover:text-primary transition-colors"
+                  className="px-3 py-1 rounded-full bg-muted/70 text-muted-foreground text-xs hover:bg-primary/20 hover:text-primary transition-colors border border-border/60"
                 >
                   {tag}
                 </Link>
               ))}
-              <button
-                className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ title: post.title, url: window.location.href });
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                  }
-                }}
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                Share
-              </button>
             </motion.div>
 
             {/* CTA */}
@@ -191,7 +196,7 @@ const BlogPost = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="glass-card p-8 text-center mb-16"
+              className="glass-card p-8 sm:p-10 text-center mb-16"
             >
               <div className="text-4xl mb-3">🌠</div>
               <h3 className="font-display text-xl font-bold mb-2 text-foreground">
@@ -233,16 +238,16 @@ const BlogPost = () => {
                   <Link
                     key={related.id}
                     to={`/blog/${related.slug}`}
-                    className="group glass-card p-5 flex flex-col transition-all duration-300 hover:border-primary/30 hover:scale-[1.02]"
+                    className="group glass-card p-6 flex flex-col transition-all duration-300 hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5"
                   >
-                    <div className="text-4xl mb-3">{related.image}</div>
+                    <div className="text-4xl mb-3 leading-none">{related.image}</div>
                     <span className="text-xs text-primary font-medium mb-2">{related.category}</span>
                     <h4 className="font-display text-sm font-semibold mb-2 group-hover:text-accent transition-colors leading-snug flex-1">
                       {related.title}
                     </h4>
                     <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
                       <span>{related.readTime}</span>
-                      <span className="flex items-center gap-1 group-hover:text-accent transition-colors">
+                      <span className="flex items-center gap-1 group-hover:text-accent transition-colors font-semibold">
                         Read <ArrowRight className="w-3 h-3" />
                       </span>
                     </div>

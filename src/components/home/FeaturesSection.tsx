@@ -85,10 +85,10 @@ const FeaturesSection = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`group glass-card p-8 transition-all duration-500 cursor-pointer ${feature.bgGlow}`}
+              className={`group glass-card p-8 transition-all duration-500 hover:-translate-y-2 cursor-pointer ${feature.bgGlow}`}
             >
-              <div className={`w-14 h-14 rounded-xl bg-muted flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                <feature.icon className={`w-7 h-7 ${feature.color}`} />
+              <div className={`w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <feature.icon className={`w-10 h-10 ${feature.color}`} />
               </div>
               <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-gradient-gold transition-all duration-300">
                 {feature.title}

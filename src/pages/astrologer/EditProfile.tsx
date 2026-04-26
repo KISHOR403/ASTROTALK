@@ -16,10 +16,10 @@ import {
     Languages,
     IndianRupee,
     FileText,
-    Sparkles,
     X,
     Plus
 } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 const AVATAR_OPTIONS = ['✨', '🔮', '⭐', '🌙', '☀️', '🧙', '🪐', '💫', '🌟', '🔯', '🕉️', '☮️'];
 
@@ -176,7 +176,7 @@ const EditProfile = () => {
                             <Card className="glass-card border-white/5">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold flex items-center gap-2">
-                                        <Sparkles className="w-5 h-5 text-accent" /> Avatar
+                                        <Logo className="w-6 h-6 animate-pulse-glow" /> Avatar
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>

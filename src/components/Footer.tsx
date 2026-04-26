@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, Star, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Star, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import Logo from './Logo';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -42,11 +43,11 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
               <div className="relative">
-                <Sparkles className="w-8 h-8 text-accent" />
+                <Logo className="w-8 h-8" />
                 <Star className="w-4 h-4 text-primary absolute -top-1 -right-1" />
               </div>
               <span className="font-display text-2xl font-semibold text-gradient-gold">
-                AstroTalk
+                Vedic
               </span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm leading-relaxed">
@@ -125,7 +126,7 @@ const Footer = () => {
         <div className="section-divider my-12" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} AstroTalk. All rights reserved.
+            © {currentYear} Vedic. All rights reserved.
           </p>
           <div className="flex gap-6">
             {footerLinks.company.slice(2).map((link) => (

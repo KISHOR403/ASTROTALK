@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -77,7 +78,7 @@ const LoginPage = () => {
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-white/10 mb-6 shadow-lg shadow-primary/20"
                 >
-                  <Sparkles className="w-8 h-8 text-accent animate-pulse" />
+                  <Logo className="w-10 h-10 animate-pulse-glow" />
                 </motion.div>
                 <h1 className="font-display text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">Welcome Back</h1>
                 <p className="text-white/60 text-sm">Sign in to continue your cosmic journey</p>

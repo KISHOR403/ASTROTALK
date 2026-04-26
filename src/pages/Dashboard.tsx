@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { User as UserIcon, Calendar, Clock, MapPin, FileText, Download, Settings, LogOut, Star, Sparkles, MessageCircle, AlertCircle } from 'lucide-react';
+import { User as UserIcon, Calendar, Clock, MapPin, FileText, Download, Settings, LogOut, Star, MessageCircle, AlertCircle } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -192,7 +193,7 @@ const DashboardPage = () => {
                   {/* Welcome Card */}
                   <div className="glass-card p-8 bg-gradient-to-r from-primary/20 to-accent/10">
                     <div className="flex items-center gap-4 mb-4">
-                      <Sparkles className="w-8 h-8 text-accent" />
+                      <Logo className="w-10 h-10 animate-pulse-glow" />
                       <div>
                         <h1 className="font-display text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0]}!</h1>
                         <p className="text-muted-foreground">Your cosmic journey continues...</p>
