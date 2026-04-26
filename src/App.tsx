@@ -16,7 +16,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
-import AstrologerDashboard from "./pages/astrologer/Dashboard";
+import AstrologerDashboard from "./pages/AstrologerDashboard";
+import AstrologerOnboarding from "./pages/AstrologerOnboarding";
 import Availability from "./pages/astrologer/Availability";
 import Bookings from "./pages/astrologer/Bookings";
 import Earnings from "./pages/astrologer/Earnings";
@@ -48,18 +49,33 @@ const App = () => (
         <Route path="/terms" element={<TermsOfService />} />
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
+        {/* Client Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['client', 'admin']} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/chat/:bookingId" element={<Chat />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/book/:astrologerId" element={<BookingPage />} />
+        </Route>
+
+        {/* Astrologer Onboarding (Pending) */}
+        <Route element={<ProtectedRoute allowedRoles={['astrologer']} allowedStatus={['pending']} />}>
+          <Route path="/astrologer/onboarding" element={<AstrologerOnboarding />} />
+        </Route>
+
+        {/* Approved Astrologer Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['astrologer', 'admin']} allowedStatus={['approved', 'active']} />}>
           <Route path="/astrologer/dashboard" element={<AstrologerDashboard />} />
           <Route path="/astrologer/availability" element={<Availability />} />
           <Route path="/astrologer/bookings" element={<Bookings />} />
           <Route path="/astrologer/earnings" element={<Earnings />} />
           <Route path="/astrologer/edit-profile" element={<EditProfile />} />
           <Route path="/astrologer/notifications" element={<NotificationSettings />} />
-          <Route path="/book/:astrologerId" element={<BookingPage />} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
         </Route>
 
         <Route path="*" element={<NotFound />} />

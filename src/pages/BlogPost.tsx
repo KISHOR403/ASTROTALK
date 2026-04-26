@@ -213,7 +213,7 @@ const BlogPost = () => {
                   Book a Consultation
                 </Link>
                 <Link
-                  to="/astrologers"
+                  to="/booking"
                   className="px-6 py-3 rounded-lg border border-border text-muted-foreground font-semibold text-sm hover:bg-muted transition-colors"
                 >
                   Browse Astrologers

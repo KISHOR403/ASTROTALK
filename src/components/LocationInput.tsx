@@ -12,7 +12,6 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-    PopoverAnchor,
 } from '@/components/ui/popover';
 import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
 
@@ -38,27 +37,19 @@ export const LocationInput = ({
         setInputValue(value);
     }, [value]);
 
-    // Manage popover visibility
-    useEffect(() => {
-        if (inputValue.length >= 2 && (isLoading || suggestions.length > 0)) {
-            setOpen(true);
-        } else if (inputValue.length < 2) {
-            setOpen(false);
-        }
-    }, [inputValue, isLoading, suggestions]);
-
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverAnchor asChild>
+            <PopoverTrigger asChild>
                 <div className={cn('relative w-full', className)}>
                     <input
                         type="text"
                         value={inputValue}
                         onChange={(e) => {
-                            setInputValue(e.target.value);
-                            // Only call external onChange if we want the parent to track every keystroke
-                            // which is likely desired for field reset/binding
-                            onChange(e.target.value);
+                            const next = e.target.value;
+                            setInputValue(next);
+                            onChange(next);
+                            if (next.length >= 2) setOpen(true);
+                            else setOpen(false);
                         }}
                         onFocus={() => {
                             if (inputValue.length >= 2) setOpen(true);
@@ -67,13 +58,12 @@ export const LocationInput = ({
                         className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-accent/20 focus:border-accent focus:ring-1 focus:ring-accent focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] outline-none transition-all text-foreground placeholder:text-muted-foreground"
                     />
                 </div>
-            </PopoverAnchor>
+            </PopoverTrigger>
             <PopoverContent
                 className="w-[var(--radix-popover-trigger-width)] p-0"
                 align="start"
                 sideOffset={5}
                 onOpenAutoFocus={(e) => e.preventDefault()}
-                onFocusOutside={(e) => e.preventDefault()}
             >
                 <Command shouldFilter={false} className="border-none">
                     <CommandList>

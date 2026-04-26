@@ -11,7 +11,11 @@ import {
     CheckCircle2,
     ChevronRight,
     AlertCircle,
-    MessageSquare
+    MessageSquare,
+    ArrowLeft,
+    Sparkles,
+    ShieldCheck,
+    Receipt
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -161,14 +165,57 @@ const BookingPage = () => {
             <StarfieldBackground />
             <Navbar />
 
-            <main className="flex-1 container mx-auto px-4 pt-28 pb-24 max-w-4xl">
+            <main className="flex-1 container mx-auto px-4 pt-28 pb-24 max-w-6xl">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8"
+                >
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                        <div>
+                            <button
+                                onClick={() => navigate('/booking')}
+                                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm glass-card px-4 py-2 mb-4"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Back to astrologers
+                            </button>
+
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase">
+                                <Sparkles className="w-3.5 h-3.5" />
+                                Book your session
+                            </div>
+                            <h1 className="font-display text-3xl md:text-4xl font-bold mt-3 leading-tight">
+                                <span className="text-foreground">Confirm a slot with </span>
+                                <span className="text-gradient-cosmic">{astrologer?.user.name}</span>
+                            </h1>
+                            <p className="text-muted-foreground mt-2 max-w-2xl">
+                                Pick an available time, add a short topic, then complete checkout.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary uppercase font-bold text-[10px] tracking-widest px-3 py-1.5">
+                                <ShieldCheck className="w-3 h-3 mr-1.5" /> Secure
+                            </Badge>
+                            <Badge variant="outline" className="bg-white/5 border-white/10 text-muted-foreground uppercase font-bold text-[10px] tracking-widest px-3 py-1.5">
+                                <Clock className="w-3 h-3 mr-1.5" /> 30 min
+                            </Badge>
+                            <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary uppercase font-bold text-[10px] tracking-widest px-3 py-1.5">
+                                <Clock className="w-3 h-3 mr-1.5" /> India Time
+                            </Badge>
+                        </div>
+                    </div>
+                </motion.div>
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 lg:grid-cols-5 gap-8"
+                    className="grid grid-cols-1 lg:grid-cols-12 gap-8"
                 >
                     {/* Left Column: Astrologer Info & Topic */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-4 space-y-6">
                         <Card className="glass-card border-white/5 overflow-hidden">
                             <div className="h-24 bg-gradient-cosmic relative overflow-hidden">
                                 <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
@@ -233,6 +280,36 @@ const BookingPage = () => {
                             )}
                         </AnimatePresence>
 
+                        <Card className="glass-card border-white/5">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base font-display">Order Summary</CardTitle>
+                                <CardDescription>Review before checkout.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Consultation (30 min)</span>
+                                        <span className="font-semibold">₹{(astrologer?.pricePerMinute || 0) * 30}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">GST</span>
+                                        <span className="font-semibold">Included</span>
+                                    </div>
+                                    <div className="h-px bg-white/5" />
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-display font-bold">Total</span>
+                                        <span className="font-display font-bold text-gradient-gold">₹{(astrologer?.pricePerMinute || 0) * 30}</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
+                                    <Receipt className="w-4 h-4 text-primary mt-0.5" />
+                                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                        Your slot is reserved only after payment is completed.
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         <Button
                             className="w-full btn-cosmic py-6 text-lg group"
                             disabled={!selectedSlot || !topic.trim() || isSubmitting}
@@ -252,14 +329,14 @@ const BookingPage = () => {
                     </div>
 
                     {/* Right Column: Slot Selection */}
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-8">
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h3 className="font-display text-2xl font-bold">Pick a Time Slot</h3>
                                 <p className="text-sm text-muted-foreground">Select an available slot for your consultation</p>
                             </div>
-                            <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary uppercase font-bold text-[10px] tracking-widest px-3">
-                                <Clock className="w-3 h-3 mr-1.5" /> India Time
+                            <Badge variant="outline" className="bg-white/5 border-white/10 text-muted-foreground uppercase font-bold text-[10px] tracking-widest px-3">
+                                <Clock className="w-3 h-3 mr-1.5" /> Tap to select
                             </Badge>
                         </div>
 
@@ -278,7 +355,7 @@ const BookingPage = () => {
                                                 <button
                                                     key={slot._id}
                                                     onClick={() => setSelectedSlot(slot)}
-                                                    className={`p-3 rounded-xl border transition-all text-sm font-medium flex items-center justify-center gap-2 ${selectedSlot?._id === slot._id
+                                                    className={`p-3 rounded-2xl border transition-all text-sm font-medium flex items-center justify-center gap-2 ${selectedSlot?._id === slot._id
                                                         ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_20px_hsl(270_60%_55%/0.4)]'
                                                         : 'bg-white/5 border-white/10 hover:border-primary/40 hover:bg-white/10'
                                                         }`}
@@ -291,7 +368,7 @@ const BookingPage = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-20 text-center glass-card border-white/5 rounded-2xl">
+                                <div className="p-16 sm:p-20 text-center glass-card border-white/5 rounded-3xl">
                                     <AlertCircle className="w-12 h-12 text-muted-foreground opacity-20 mx-auto mb-4" />
                                     <p className="text-muted-foreground font-medium italic">No available slots at the moment.</p>
                                     <Button variant="link" className="text-accent mt-2">Check later</Button>

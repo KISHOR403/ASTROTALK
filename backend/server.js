@@ -377,7 +377,8 @@ app.get('/', (req, res) => {
 });
 
 const authRoutes = require('./routes/authRoutes');
-const astrologerRoutes = require('./routes/astrologerRoutes');
+const astrologerRoutes = require('./routes/astrologer');
+const adminRoutes = require('./routes/admin');
 const bookingRoutes = require('./routes/bookingRoutes');
 const astroRoutes = require('./routes/astroRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -386,7 +387,9 @@ const horoscopeRoutes = require('./routes/horoscope');
 const horoscopeSignRoutes = require('./routes/horoscopeRoutes');
 
 app.use('/api/auth', authRoutes);
-app.use('/api/astrologers', astrologerRoutes);
+app.use('/api/astrologer', astrologerRoutes); // New routes
+app.use('/api/admin', adminRoutes); // New routes
+app.use('/api/astrologers', require('./routes/astrologerRoutes')); // Legacy
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/astro', astroRoutes);
 app.use('/api/users', userRoutes);

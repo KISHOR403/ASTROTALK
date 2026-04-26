@@ -1,229 +1,208 @@
-const Astrologer = require('../models/Astrologer');
+const Astrologer = require('../models/Astrologer'); // Keep for legacy if needed
+const AstrologerProfile = require('../models/AstrologerProfile');
 const Booking = require('../models/Booking');
+const User = require('../models/User');
 
-// @desc    Get all astrologers
-// @route   GET /api/astrologers
-// @access  Public
-const getAllAstrologers = async (req, res) => {
+// @desc    Complete astrologer onboarding
+// @route   POST /api/astrologer/onboarding
+// @access  Private
+const completeOnboarding = async (req, res) => {
     try {
-        const astrologers = await Astrologer.find({}).populate('user', 'name email');
+        const { specialization, experience, languages, pricePerMin, bio, profilePhoto } = req.body;
+        
+        let profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        
+        if (!profile) {
+            profile = new AstrologerProfile({ userId: req.user._id });
+        }
+
+        profile.specialization = specialization;
+        profile.experience = experience;
+        profile.languages = languages;
+        profile.pricePerMin = pricePerMin;
+        profile.bio = bio;
+        profile.profilePhoto = profilePhoto;
+        profile.status = 'pending';
+
+        await profile.save();
+        res.json({ message: 'Profile submitted for review' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get logged-in astrologer's profile
+// @route   GET /api/astrologer/profile
+// @access  Private
+const getMyProfile = async (req, res) => {
+    try {
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id }).populate('userId', 'name email');
+        if (!profile) {
+            return res.status(404).json({ message: 'Profile not found' });
+        }
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Set astrologer online status
+// @route   PATCH /api/astrologer/go-online
+// @access  Private
+const goOnline = async (req, res) => {
+    try {
+        const profile = await AstrologerProfile.findOneAndUpdate(
+            { userId: req.user._id },
+            { isOnline: true },
+            { new: true }
+        );
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Set astrologer offline status
+// @route   PATCH /api/astrologer/go-offline
+// @access  Private
+const goOffline = async (req, res) => {
+    try {
+        const profile = await AstrologerProfile.findOneAndUpdate(
+            { userId: req.user._id },
+            { isOnline: false },
+            { new: true }
+        );
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get list of approved and online astrologers
+// @route   GET /api/astrologers/list
+// @access  Public
+const getApprovedAstrologers = async (req, res) => {
+    try {
+        const astrologers = await AstrologerProfile.find({ status: 'approved' })
+            .populate('userId', 'name email')
+            .select('userId specialization experience languages pricePerMin bio profilePhoto status isOnline totalRatings averageRating');
+        
+        const formatted = astrologers.map(a => ({
+            _id: a._id,
+            name: a.userId.name,
+            photo: a.profilePhoto,
+            specialization: a.specialization,
+            pricePerMin: a.pricePerMin,
+            averageRating: a.averageRating,
+            isOnline: a.isOnline
+        }));
+
+        res.json(formatted);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// ... existing legacy handlers can stay or be replaced ...
+const getAllAstrologers = async (req, res) => {
+    // Legacy support
+    try {
+        const astrologers = await AstrologerProfile.find({ status: 'approved' }).populate('userId', 'name email');
         res.json(astrologers);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Get single astrologer
-// @route   GET /api/astrologers/:id
-// @access  Public
 const getAstrologerById = async (req, res) => {
     try {
-        const astrologer = await Astrologer.findById(req.params.id).populate('user', 'name email');
-
-        if (astrologer) {
-            res.json(astrologer);
-        } else {
-            res.status(404).json({ message: 'Astrologer not found' });
-        }
+        const astrologer = await AstrologerProfile.findById(req.params.id).populate('userId', 'name email');
+        if (astrologer) res.json(astrologer);
+        else res.status(404).json({ message: 'Astrologer not found' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Update astrologer availability
-// @route   PUT /api/astrologers/availability
-// @access  Private/Astrologer
-const updateAvailability = async (req, res) => {
-    try {
-        const astrologer = await Astrologer.findOne({ user: req.user._id });
-
-        if (astrologer) {
-            astrologer.isAvailable = req.body.isAvailable !== undefined ? req.body.isAvailable : astrologer.isAvailable;
-            const updatedAstrologer = await astrologer.save();
-            res.json(updatedAstrologer);
-        } else {
-            res.status(404).json({ message: 'Astrologer profile not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Get astrologer dashboard stats
-// @route   GET /api/astrologers/dashboard
-// @access  Private/Astrologer
 const getAstrologerDashboard = async (req, res) => {
     try {
-        const astrologer = await Astrologer.findOne({ user: req.user._id });
-
-        if (!astrologer) {
-            return res.status(404).json({ message: 'Astrologer profile not found' });
-        }
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
         const stats = {
-            totalBookings: await Booking.countDocuments({ astrologer: astrologer._id }),
-            todaysSessions: await Booking.countDocuments({
-                astrologer: astrologer._id,
-                startTime: {
-                    $gte: new Date().setHours(0, 0, 0, 0),
-                    $lt: new Date().setHours(23, 59, 59, 999)
-                }
-            }),
-            totalEarnings: await Booking.aggregate([
-                { $match: { astrologer: astrologer._id, status: 'completed' } },
-                { $group: { _id: null, total: { $sum: '$price' } } }
-            ]).then(res => res[0]?.total || 0),
-            unreadMessages: 5, // Mock value
-            isAvailable: astrologer.isAvailable
+            totalEarnings: profile.totalEarnings,
+            averageRating: profile.averageRating,
+            isOnline: profile.isOnline,
+            totalRatings: profile.totalRatings
         };
-
         res.json(stats);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Update astrologer availability slots
-// @route   POST /api/astrologers/availability/slots
-// @access  Private/Astrologer
-const updateAvailabilitySlots = async (req, res) => {
+const updateAvailability = async (req, res) => {
     try {
-        const { date, slots } = req.body;
-        const astrologer = await Astrologer.findOne({ user: req.user._id });
-
-        if (!astrologer) {
-            return res.status(404).json({ message: 'Astrologer profile not found' });
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        if (profile) {
+            profile.isOnline = req.body.isAvailable !== undefined ? req.body.isAvailable : profile.isOnline;
+            await profile.save();
+            res.json(profile);
+        } else {
+            res.status(404).json({ message: 'Profile not found' });
         }
-
-        // Clean up date to start of day for consistency
-        const targetDate = new Date(date);
-        targetDate.setHours(0, 0, 0, 0);
-
-        // Remove existing slots for this date
-        astrologer.availabilitySlots = astrologer.availabilitySlots.filter(
-            slot => new Date(slot.date).setHours(0, 0, 0, 0) !== targetDate.getTime()
-        );
-
-        // Add new slots
-        const newSlots = slots.map(slot => ({
-            date: targetDate,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-            isBooked: false
-        }));
-
-        astrologer.availabilitySlots.push(...newSlots);
-        await astrologer.save();
-
-        res.json(astrologer.availabilitySlots.filter(
-            slot => new Date(slot.date).setHours(0, 0, 0, 0) === targetDate.getTime()
-        ));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Get astrologer earnings stats
-// @route   GET /api/astrologers/earnings
-// @access  Private/Astrologer
+const updateAvailabilitySlots = async (req, res) => {
+    // Simplified placeholder for legacy slot update
+    res.status(501).json({ message: 'Slot management is being updated' });
+};
+
 const getAstrologerEarnings = async (req, res) => {
     try {
-        const astrologer = await Astrologer.findOne({ user: req.user._id });
-
-        if (!astrologer) {
-            return res.status(404).json({ message: 'Astrologer profile not found' });
-        }
-
-        const now = new Date();
-        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-        const totalEarnings = await Booking.aggregate([
-            { $match: { astrologer: astrologer._id, status: 'completed' } },
-            { $group: { _id: null, total: { $sum: '$price' } } }
-        ]).then(res => res[0]?.total || 0);
-
-        const monthlyEarnings = await Booking.aggregate([
-            {
-                $match: {
-                    astrologer: astrologer._id,
-                    status: 'completed',
-                    startTime: { $gte: firstDayOfMonth }
-                }
-            },
-            { $group: { _id: null, total: { $sum: '$price' } } }
-        ]).then(res => res[0]?.total || 0);
-
-        const sessionsCompleted = await Booking.countDocuments({
-            astrologer: astrologer._id,
-            status: 'completed'
-        });
-
-        // Mock pending payout as 15% of total for demonstration
-        const pendingPayout = totalEarnings > 0 ? totalEarnings * 0.15 : 0;
-
-        res.json({
-            totalEarnings,
-            monthlyEarnings,
-            pendingPayout,
-            sessionsCompleted
-        });
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
+        res.json({ totalEarnings: profile.totalEarnings });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Get logged-in astrologer's own profile
-// @route   GET /api/astrologers/me
-// @access  Private/Astrologer
-const getMyProfile = async (req, res) => {
-    try {
-        const astrologer = await Astrologer.findOne({ user: req.user._id }).populate('user', 'name email');
-        if (!astrologer) {
-            return res.status(404).json({ message: 'Astrologer profile not found' });
-        }
-        res.json(astrologer);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Update astrologer profile
-// @route   PUT /api/astrologers/profile
-// @access  Private/Astrologer
 const updateAstrologerProfile = async (req, res) => {
     try {
-        const astrologer = await Astrologer.findOne({ user: req.user._id });
+        const profile = await AstrologerProfile.findOne({ userId: req.user._id });
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
-        if (!astrologer) {
-            return res.status(404).json({ message: 'Astrologer profile not found' });
-        }
+        const { specialization, experience, pricePerMin, bio, languages } = req.body;
+        if (specialization) profile.specialization = specialization;
+        if (experience) profile.experience = experience;
+        if (pricePerMin) profile.pricePerMin = pricePerMin;
+        if (bio) profile.bio = bio;
+        if (languages) profile.languages = languages;
 
-        const { title, bio, specializations, experience, pricePerMinute, languages, avatar } = req.body;
-
-        if (title !== undefined) astrologer.title = title;
-        if (bio !== undefined) astrologer.bio = bio;
-        if (specializations !== undefined) astrologer.specializations = specializations;
-        if (experience !== undefined) astrologer.experience = experience;
-        if (pricePerMinute !== undefined) astrologer.pricePerMinute = pricePerMinute;
-        if (languages !== undefined) astrologer.languages = languages;
-        if (avatar !== undefined) astrologer.avatar = avatar;
-
-        const updated = await astrologer.save();
-        const populated = await updated.populate('user', 'name email');
-
-        res.json(populated);
+        await profile.save();
+        res.json(profile);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
 module.exports = {
+    completeOnboarding,
+    getMyProfile,
+    goOnline,
+    goOffline,
+    getApprovedAstrologers,
     getAllAstrologers,
     getAstrologerById,
-    updateAvailability,
     getAstrologerDashboard,
+    updateAvailability,
     updateAvailabilitySlots,
     getAstrologerEarnings,
-    getMyProfile,
     updateAstrologerProfile
 };
+
+

@@ -1,5 +1,7 @@
 const User = require('../models/User');
+const AstrologerProfile = require('../models/AstrologerProfile');
 const jwt = require('jsonwebtoken');
+const { sendReviewEmail } = require('../utils/sendEmail');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -18,20 +20,34 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        const userStatus = role === 'astrologer' ? 'pending' : 'active';
+
         const user = await User.create({
             name,
             email,
             password,
-            role: role || 'client'
+            role: role || 'client',
+            status: userStatus
         });
 
         if (user) {
+            if (role === 'astrologer') {
+                await AstrologerProfile.create({
+                    userId: user._id,
+                    status: 'pending'
+                });
+                // Send review email
+                await sendReviewEmail(user.email, user.name);
+            }
+
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 token: generateToken(user._id),
+                message: role === 'astrologer' ? 'Complete your onboarding' : undefined
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -48,11 +64,21 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
+            if (user.role === 'astrologer') {
+                if (user.status === 'pending') {
+                    return res.status(403).json({ message: 'Your account is under review by admin' });
+                }
+                if (user.status === 'rejected') {
+                    return res.status(403).json({ message: 'Your application was not approved. Contact support.' });
+                }
+            }
+
             res.json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 token: generateToken(user._id),
             });
         } else {

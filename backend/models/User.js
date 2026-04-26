@@ -9,8 +9,13 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        enum: ['client', 'astrologer'],
+        enum: ['client', 'astrologer', 'admin'],
         default: 'client'
+    },
+    status: {
+        type: String,
+        enum: ['active', 'pending', 'approved', 'rejected'],
+        default: 'active'
     },
     birthDetails: {
         date: Date,

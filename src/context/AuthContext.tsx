@@ -5,7 +5,8 @@ interface User {
     _id: string;
     name: string;
     email: string;
-    role: 'client' | 'astrologer';
+    role: 'client' | 'astrologer' | 'admin';
+    status: 'active' | 'pending' | 'approved' | 'rejected';
     token: string;
 }
 
@@ -34,6 +35,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
     }, []);
 
+    const handleNavigation = (u: User) => {
+        if (u.role === 'admin') {
+            navigate('/admin/dashboard');
+        } else if (u.role === 'astrologer') {
+            if (u.status === 'pending') {
+                navigate('/astrologer/onboarding');
+            } else if (u.status === 'approved') {
+                navigate('/astrologer/dashboard');
+            } else {
+                navigate('/');
+            }
+        } else {
+            navigate('/dashboard');
+        }
+    };
+
     const login = async (email: string, password: string) => {
         const response = await fetch('http://localhost:5000/api/auth/login', {
             method: 'POST',
@@ -44,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.ok) {
             localStorage.setItem('userInfo', JSON.stringify(data));
             setUser(data);
-            navigate('/dashboard');
+            handleNavigation(data);
         } else {
             throw new Error(data.message || 'Login failed');
         }
@@ -60,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.ok) {
             localStorage.setItem('userInfo', JSON.stringify(data));
             setUser(data);
-            navigate('/dashboard');
+            handleNavigation(data);
         } else {
             throw new Error(data.message || 'Registration failed');
         }
@@ -76,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.ok) {
             localStorage.setItem('userInfo', JSON.stringify(data));
             setUser(data);
-            navigate('/dashboard');
+            handleNavigation(data);
         } else {
             throw new Error(data.message || 'Google Login failed');
         }
@@ -102,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         </AuthContext.Provider>
     );
 };
+
 
 export const useAuth = () => {
     const context = useContext(AuthContext);

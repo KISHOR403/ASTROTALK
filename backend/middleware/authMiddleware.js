@@ -41,4 +41,22 @@ const authorize = (...roles) => {
     };
 };
 
-module.exports = { protect, authorize };
+const isAstrologer = (req, res, next) => {
+    if (req.user && req.user.role === 'astrologer' && req.user.status === 'approved') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Not authorized as an approved astrologer' });
+    }
+};
+
+const isAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Not authorized as an admin' });
+    }
+};
+
+module.exports = { protect, authorize, isAstrologer, isAdmin };
+
+
