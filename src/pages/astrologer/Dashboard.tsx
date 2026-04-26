@@ -1,270 +1,235 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Users,
-    Calendar,
-    IndianRupee,
-    MessageSquare,
-    SwitchCamera,
-    LogOut,
-    User as UserIcon,
-    Bell,
-    CheckCircle2,
-    Clock,
-    ArrowUpRight
-} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-
-const StatCard = ({ title, value, icon: Icon, trend, color }: any) => (
-    <Card className="glass-card border-white/5 hover:border-primary/20 transition-all duration-300">
-        <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-                <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-                    <h3 className="text-2xl font-bold font-display">{value}</h3>
-                    {trend && (
-                        <div className="flex items-center gap-1 mt-2">
-                            <span className="text-[10px] font-bold text-success px-1.5 py-0.5 rounded-full bg-success/10 flex items-center gap-0.5">
-                                <ArrowUpRight className="w-2.5 h-2.5" />
-                                {trend}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">vs last month</span>
-                        </div>
-                    )}
-                </div>
-                <div className={`p-3 rounded-2xl ${color} bg-opacity-20 flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
-                </div>
-            </div>
-        </CardContent>
-    </Card>
-);
+import socket from '@/lib/socket';
+import { 
+    User, 
+    Power, 
+    DollarSign, 
+    Star, 
+    Calendar, 
+    Clock, 
+    MessageSquare,
+    ChevronRight,
+    TrendingUp,
+    Shield
+} from 'lucide-react';
 
 const AstrologerDashboard = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth() as any;
+    const { toast } = useToast();
     const navigate = useNavigate();
+    const [profile, setProfile] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isToggling, setIsToggling] = useState(false);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/astrologers/dashboard', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                const data = await response.json();
-                setStats(data);
-            } catch (error) {
-                console.error('Error fetching dashboard stats:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, []);
-
-    const toggleAvailability = async () => {
-        setIsToggling(true);
-        try {
-            const response = await fetch('http://localhost:5000/api/astrologers/availability', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ isAvailable: !stats.isAvailable })
+        if (user) {
+            socket.emit('join_room', user._id);
+            socket.on('new_notification', (data) => {
+                if (data.type === 'new_booking') {
+                    // Show toast and add to list
+                    toast({ title: "New Chat Request!", description: data.message });
+                    setRequests(prev => [data.booking, ...prev]);
+                }
             });
-            const updated = await response.json();
-            setStats({ ...stats, isAvailable: updated.isAvailable });
+            return () => {
+                socket.off('new_notification');
+            };
+        }
+    }, [user]);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [profileRes, statsRes, requestsRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/astrologer/profile', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    }),
+                    fetch('http://localhost:5000/api/astrologer/dashboard', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    }),
+                    fetch('http://localhost:5000/api/astrologer/requests', {
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    })
+                ]);
+
+                if (profileRes.ok && statsRes.ok && requestsRes.ok) {
+                    setProfile(await profileRes.json());
+                    setStats(await statsRes.json());
+                    setRequests(await requestsRes.json());
+                } else {
+                    const errorData = await profileRes.json();
+                    if (errorData.message === 'Profile not found') {
+                        navigate('/astrologer/onboarding');
+                    } else {
+                        toast({ title: "Error", description: "Failed to fetch dashboard data", variant: "destructive" });
+                    }
+                }
+            } catch (error) {
+                toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
+            } finally {
+                setLoading(false);
+            }
+
+        };
+        fetchData();
+    }, [user.token]);
+
+    const toggleOnline = async () => {
+        const endpoint = profile.isOnline ? 'go-offline' : 'go-online';
+        try {
+            const res = await fetch(`http://localhost:5000/api/astrologer/${endpoint}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            if (res.ok) {
+                const updated = await res.json();
+                setProfile(prev => ({ ...prev, isOnline: updated.isOnline }));
+                toast({ 
+                    title: updated.isOnline ? "You're Online!" : "You're Offline",
+                    description: updated.isOnline ? "Clients can now see you." : "You won't receive new consultation requests.",
+                });
+            }
         } catch (error) {
-            console.error('Error toggling availability:', error);
-        } finally {
-            setIsToggling(false);
+            toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
         }
     };
 
-    if (isLoading) {
-        return (
-            <Layout>
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
-            </Layout>
-        );
-    }
+    const handleRequest = async (id: string, action: 'accept' | 'reject') => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/astrologer/requests/${id}/${action}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            if (res.ok) {
+                toast({ title: `Request ${action}ed` });
+                setRequests(prev => prev.filter(r => r._id !== id));
+            }
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to process request", variant: "destructive" });
+        }
+    };
+
+    if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading Dashboard...</div>;
 
     return (
         <Layout>
-            <div className="pt-28 pb-20 min-h-screen">
-                <div className="container mx-auto px-4">
-                    {/* Header Section */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                        <div>
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-3 mb-2"
-                            >
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-cosmic p-[1px]">
-                                    <div className="w-full h-full rounded-2xl bg-card flex items-center justify-center text-xl">
-                                        ✨
-                                    </div>
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold font-display">Welcome, {user?.name}</h1>
-                                    <p className="text-sm text-muted-foreground">Here&apos;s your consultation summary</p>
-                                </div>
-                            </motion.div>
-                        </div>
-
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-4"
-                        >
-                            <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-muted/30 border border-white/5">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Status</span>
-                                    <Badge variant={stats?.isAvailable ? "outline" : "secondary"} className={`text-[10px] h-5 ${stats?.isAvailable ? 'text-success border-success/30' : ''}`}>
-                                        {stats?.isAvailable ? "Online" : "Offline"}
-                                    </Badge>
-                                </div>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className={`rounded-xl border-white/10 hover:bg-primary/20 ${isToggling ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    onClick={toggleAvailability}
-                                    disabled={isToggling}
-                                >
-                                    <SwitchCamera className="w-4 h-4 mr-2" />
-                                    Toggle
-                                </Button>
+            <div className="min-h-screen py-12 container mx-auto px-4">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="relative">
+                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
+                                <img 
+                                    src={profile?.profilePhoto || "https://api.dicebear.com/7.x/avataaars/svg?seed=Astro"} 
+                                    alt="Profile" 
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
-                        </motion.div>
+                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 border-black flex items-center justify-center ${profile?.isOnline ? 'bg-green-500' : 'bg-red-500'}`}>
+                                <Power size={12} className="text-white" />
+                            </div>
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                                Welcome, {user.name}
+                                {profile?.status === 'approved' && <Shield className="text-primary w-6 h-6" />}
+                            </h1>
+                            <p className="text-white/50">{profile?.specialization?.join(', ')} • {profile?.experience} Years Exp.</p>
+                        </div>
                     </div>
+                    
+                    <button 
+                        onClick={toggleOnline}
+                        className={`px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-3 hover:scale-105 active:scale-95 ${
+                            profile?.isOnline 
+                                ? 'bg-red-500/10 border border-red-500/30 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
+                                : 'bg-green-500/10 border border-green-500/30 text-green-500 shadow-[0_0_20px_rgba(34,197,94,0.2)]'
+                        }`}
+                    >
+                        <Power size={20} />
+                        Go {profile?.isOnline ? 'Offline' : 'Online'}
+                    </button>
+                </div>
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                        <StatCard
-                            title="Total Bookings"
-                            value={stats?.totalBookings || 0}
-                            icon={Users}
-                            trend="+12%"
-                            color="bg-primary"
-                        />
-                        <StatCard
-                            title="Today's Sessions"
-                            value={stats?.todaysSessions || 0}
-                            icon={Calendar}
-                            color="bg-accent"
-                        />
-                        <StatCard
-                            title="Total Earnings"
-                            value={`₹${stats?.totalEarnings || 0}`}
-                            icon={IndianRupee}
-                            trend="+8%"
-                            color="bg-success"
-                        />
-                        <StatCard
-                            title="Unread Messages"
-                            value={stats?.unreadMessages || 0}
-                            icon={MessageSquare}
-                            color="bg-purple-500"
-                        />
-                    </div>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <StatCard title="Total Earnings" value={`₹${stats?.totalEarnings}`} icon={<DollarSign className="text-primary" />} trend="+12% this month" />
+                    <StatCard title="Average Rating" value={stats?.averageRating} icon={<Star className="text-yellow-500" />} trend="Based on 48 reviews" />
+                    <StatCard title="Consultations" value="124" icon={<MessageSquare className="text-accent" />} trend="24 this week" />
+                    <StatCard title="Status" value={profile?.status?.toUpperCase()} icon={<Shield className="text-green-500" />} trend="Verified Member" />
+                </div>
 
-                    {/* Quick Actions & Recent Sessions */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <Card className="lg:col-span-2 glass-card border-white/5">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-lg font-bold">Upcoming Sessions</CardTitle>
-                                <Button variant="link" className="text-accent hover:text-accent/80 text-xs px-0">View all</Button>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {[1, 2, 3].map((_, i) => (
-                                        <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-white/5 hover:border-white/10 transition-colors group">
-                                            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
-                                                👤
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Recent Consultations */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Incoming Requests */}
+                        {requests.length > 0 && (
+                            <div className="space-y-4 mb-8">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <MessageSquare className="text-primary" />
+                                    Incoming Chat Requests
+                                </h2>
+                                <div className="grid gap-4">
+                                    {requests.map(req => (
+                                        <div key={req._id} className="bg-primary/10 border border-primary/20 p-6 rounded-3xl flex items-center justify-between animate-pulse">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                                                    <User className="text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white">{req.user?.name || "Client"}</h4>
+                                                    <p className="text-sm text-white/50">Wants to chat about {req.topic}</p>
+                                                </div>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-semibold text-sm">Prashant Kumar</h4>
-                                                <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                                                    <Clock className="w-3 h-3" />
-                                                    Today, 4:30 PM (30 min)
-                                                </p>
+                                            <div className="flex gap-3">
+                                                <button 
+                                                    onClick={() => handleRequest(req._id, 'reject')}
+                                                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/50 hover:text-red-500 transition-all text-sm font-medium"
+                                                >
+                                                    Decline
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleRequest(req._id, 'accept')}
+                                                    className="px-6 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-all text-sm font-bold shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                                                >
+                                                    Accept
+                                                </button>
                                             </div>
-                                            <div className="hidden sm:flex flex-col items-end gap-1.5">
-                                                <Badge variant="outline" className="text-[10px] text-accent border-accent/20">Career Guidance</Badge>
-                                                <span className="text-[10px] font-bold text-success">₹450</span>
-                                            </div>
-                                            <Button size="sm" className="rounded-xl ml-2 bg-gradient-cosmic">Join Chat</Button>
                                         </div>
                                     ))}
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        )}
 
-                        <div className="space-y-6">
-                            <Card className="glass-card border-white/5">
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-bold">Quick Controls</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <Button
-                                        onClick={() => navigate('/astrologer/edit-profile')}
-                                        className="w-full justify-start rounded-xl py-6 border-white/5 bg-muted/20 hover:bg-muted/30 text-foreground" variant="outline"
-                                    >
-                                        <UserIcon className="w-4 h-4 mr-3 text-primary" />
-                                        Edit Profile
-                                    </Button>
-                                    <Button
-                                        onClick={() => navigate('/astrologer/earnings')}
-                                        className="w-full justify-start rounded-xl py-6 border-white/5 bg-muted/20 hover:bg-muted/30 text-foreground" variant="outline"
-                                    >
-                                        <IndianRupee className="w-4 h-4 mr-3 text-success" />
-                                        Withdrawal Info
-                                    </Button>
-                                    <Button
-                                        onClick={() => navigate('/astrologer/notifications')}
-                                        className="w-full justify-start rounded-xl py-6 border-white/5 bg-muted/20 hover:bg-muted/30 text-foreground" variant="outline"
-                                    >
-                                        <Bell className="w-4 h-4 mr-3 text-accent" />
-                                        Notification Settings
-                                    </Button>
-                                    <div className="pt-4 border-t border-white/5">
-                                        <Button
-                                            onClick={logout}
-                                            className="w-full justify-start rounded-xl py-6 border-destructive/20 bg-destructive/10 hover:bg-destructive/20 text-destructive"
-                                            variant="ghost"
-                                        >
-                                            <LogOut className="w-4 h-4 mr-3" />
-                                            Logout from Dashboard
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                <Calendar className="text-primary" />
+                                Upcoming Consultations
+                            </h2>
+                            <button className="text-sm text-primary hover:underline">View All</button>
+                        </div>
+                        <div className="space-y-4">
+                            {[1, 2, 3].map(i => (
+                                <ConsultationRow key={i} />
+                            ))}
+                        </div>
+                    </div>
 
-                            <Card className="bg-gradient-cosmic border-none overflow-hidden relative group">
-                                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-500">
-                                    <CheckCircle2 className="w-32 h-32" />
-                                </div>
-                                <CardContent className="p-6 relative z-10">
-                                    <h4 className="font-bold text-white mb-2">Want to grow your reach?</h4>
-                                    <p className="text-white/80 text-xs mb-4">Complete your advanced certification to get featured in the Top 10 list.</p>
-                                    <Button size="sm" className="bg-white text-primary hover:bg-white/90 rounded-xl">Get Started</Button>
-                                </CardContent>
-                            </Card>
+                    {/* Quick Actions */}
+                    <div className="space-y-6">
+                        <h2 className="text-xl font-bold">Quick Actions</h2>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+                            <ActionBtn label="Edit Profile" />
+                            <ActionBtn label="Manage Availability" />
+                            <ActionBtn label="View Wallet" />
+                            <ActionBtn label="Contact Support" />
                         </div>
                     </div>
                 </div>
@@ -272,5 +237,47 @@ const AstrologerDashboard = () => {
         </Layout>
     );
 };
+
+const StatCard = ({ title, value, icon, trend }: any) => (
+    <motion.div 
+        whileHover={{ y: -5 }}
+        className="bg-white/5 border border-white/10 p-6 rounded-3xl relative overflow-hidden"
+    >
+        <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
+                {icon}
+            </div>
+            <TrendingUp size={20} className="text-white/20" />
+        </div>
+        <h3 className="text-white/40 text-sm mb-1">{title}</h3>
+        <p className="text-2xl font-bold text-white mb-2">{value}</p>
+        <p className="text-xs text-white/30">{trend}</p>
+    </motion.div>
+);
+
+const ConsultationRow = () => (
+    <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-all cursor-pointer group">
+        <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                <User className="text-primary" />
+            </div>
+            <div>
+                <h4 className="font-medium text-white group-hover:text-primary transition-colors">Rahul Sharma</h4>
+                <div className="flex items-center gap-3 text-xs text-white/40 mt-1">
+                    <span className="flex items-center gap-1"><Calendar size={12} /> Today</span>
+                    <span className="flex items-center gap-1"><Clock size={12} /> 04:30 PM</span>
+                </div>
+            </div>
+        </div>
+        <ChevronRight className="text-white/20 group-hover:text-white transition-all" />
+    </div>
+);
+
+const ActionBtn = ({ label }: any) => (
+    <button className="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all text-left text-sm font-medium flex justify-between items-center">
+        {label}
+        <ChevronRight size={16} className="text-white/20" />
+    </button>
+);
 
 export default AstrologerDashboard;
