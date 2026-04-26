@@ -4,7 +4,7 @@
       "root": "backend",
       "installCommand": "npm install",
       "routePrefix": "/api",
-      "framework": "express",
+      "runtime": "@vercel/node",
       "entrypoint": "server.js"
     },
     "frontend": {
