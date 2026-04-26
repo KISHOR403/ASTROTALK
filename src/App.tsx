@@ -27,6 +27,9 @@ import BookingPage from "./pages/BookingPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PendingAstrologers from "./pages/admin/PendingAstrologers";
+
 
 const queryClient = new QueryClient();
 
@@ -75,8 +78,10 @@ const App = () => (
 
         {/* Admin Routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/astrologers/pending" element={<PendingAstrologers />} />
         </Route>
+
 
         <Route path="*" element={<NotFound />} />
       </Routes>

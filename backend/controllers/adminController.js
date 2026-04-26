@@ -60,7 +60,26 @@ const rejectAstrologer = async (req, res) => {
         // Send rejection email
         await sendRejectionEmail(user.email, user.name);
 
-        res.json({ message: 'Astrologer rejected' });
+// @desc    Get dashboard stats
+// @route   GET /api/admin/stats
+// @access  Private/Admin
+const getDashboardStats = async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments({ role: 'client' });
+        const totalAstrologers = await User.countDocuments({ role: 'astrologer', status: 'approved' });
+        const pendingApprovals = await AstrologerProfile.countDocuments({ status: 'pending' });
+        
+        // Mock revenue and chats for now
+        const totalChats = 52100; 
+        const totalRevenue = 240000;
+
+        res.json({
+            users: totalUsers,
+            astrologers: totalAstrologers,
+            chats: totalChats,
+            revenue: totalRevenue,
+            pendingApprovals
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -69,5 +88,7 @@ const rejectAstrologer = async (req, res) => {
 module.exports = {
     getPendingAstrologers,
     approveAstrologer,
-    rejectAstrologer
+    rejectAstrologer,
+    getDashboardStats
 };
+
